@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0", "sympy>=1.11", "matplotlib>=3.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dtumathtools"
+version = "0.0.1"
+authors = [
+    {name = "Christian Mikkelstrup", email = "s194345@student.dtu.dk"},
+    {name = "Hans Henrik Hermansen", email = "s194042@student.dtu.dk"},
+]
+description = "A plotting package for the 01005 Mathematics 1 course at the Technical University of Denmark"
+readme = "README.md"
+license = {'text' = "BSD License (BSD)"}
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Education",
+    "Topic :: Education",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+[project.urls]
+"Homepage" = "https://gitlab.com/dtumath/dtumathtools"
+"Mathematics 1 homepage" = "https://01005.compute.dtu.dk/"
