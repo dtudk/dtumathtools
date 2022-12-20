@@ -1319,7 +1319,6 @@ class Scatter2dSeries(ScatterBaseSeries):
         self.y = y
         self._xlim = (min(self.x), max(self.x))
         self._ylim = (min(self.y), max(self.y))
-        self._zlim = None
         self.lenrange_x = self._xlim[1] - self._xlim[0]
         self.lenrange_y = self._ylim[1] - self._ylim[0]
 
@@ -1432,6 +1431,7 @@ class Quiver2dSeries(QuiverBaseSeries):
 
         self._xlim = kwargs.pop("xlim", rangex)
         self._ylim = kwargs.pop("ylim", rangey)
+        self._zlim = None
 
         # Saving keyword arguments
         super().__init__(**kwargs)
