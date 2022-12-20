@@ -1426,7 +1426,11 @@ class Quiver2dSeries(QuiverBaseSeries):
         self.direction = direction
 
         rangex, rangey = [
-            (min(start[i], direction[i]), max(start[i], direction[i])) for i in range(2)
+            (
+                min(start[i], start[i] + direction[i]),
+                max(start[i], start[i] + direction[i]),
+            )
+            for i in range(2)
         ]
 
         self._xlim = kwargs.pop("xlim", rangex)
@@ -1447,7 +1451,11 @@ class Quiver3dSeries(QuiverBaseSeries):
         self.direction = direction
 
         rangex, rangey, rangez = [
-            (min(start[i], direction[i]), max(start[i], direction[i])) for i in range(3)
+            (
+                min(start[i], start[i] + direction[i]),
+                max(start[i], start[i] + direction[i]),
+            )
+            for i in range(3)
         ]
 
         self._xlim = kwargs.pop("xlim", rangex)
