@@ -582,17 +582,27 @@ class BaseSeries:
     #   - get_parameter_points returning one or two np.arrays (1D or 2D)
     # used for calculation aesthetics
 
+    # Self-made function to get ax.scatter into flow of plots
     is_scatter = False
     is_3Dscatter = False
     is_2Dscatter = False
-    # Self-made function to get ax.scatter into flow of plots
+
+    # Self-made to get ax.quiver into flow of plots
+    is_quiver = False
+    is_3Dquiver = False
+    is_2Dquiver = False
 
     def __init__(self):
         super().__init__()
 
     @property
     def is_3D(self):
-        flags3D = [self.is_3Dline, self.is_3Dsurface, self.is_3Dscatter]
+        flags3D = [
+            self.is_3Dline,
+            self.is_3Dsurface,
+            self.is_3Dscatter,
+            self.is_3Dquiver,
+        ]
         return any(flags3D)
 
     @property
@@ -1309,6 +1319,7 @@ class Scatter2dSeries(ScatterBaseSeries):
         self.y = y
         self._xlim = (min(self.x), max(self.x))
         self._ylim = (min(self.y), max(self.y))
+        self._zlim = None
         self.lenrange_x = self._xlim[1] - self._xlim[0]
         self.lenrange_y = self._ylim[1] - self._ylim[0]
 
@@ -1392,6 +1403,58 @@ class Scatter3dSeries(ScatterBaseSeries):
         else:
             self._zlim = kwargs.pop("zlim")
 
+        super().__init__(**kwargs)
+
+
+class QuiverBaseSeries(BaseSeries):
+    """Representation for a quiver plot."""
+
+    is_quiver = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+
+        self.kwargs = kwargs
+
+
+class Quiver2dSeries(QuiverBaseSeries):
+
+    is_2Dquiver = True
+
+    def __init__(self, start, direction, **kwargs):
+
+        self.start = start
+        self.direction = direction
+
+        rangex, rangey = [
+            (min(start[i], direction[i]), max(start[i], direction[i])) for i in range(2)
+        ]
+
+        self._xlim = kwargs.pop("xlim", rangex)
+        self._ylim = kwargs.pop("ylim", rangey)
+
+        # Saving keyword arguments
+        super().__init__(**kwargs)
+
+
+class Quiver3dSeries(QuiverBaseSeries):
+
+    is_3Dquiver = True
+
+    def __init__(self, start, direction, **kwargs):
+
+        self.start = start
+        self.direction = direction
+
+        rangex, rangey, rangez = [
+            (min(start[i], direction[i]), max(start[i], direction[i])) for i in range(3)
+        ]
+
+        self._xlim = kwargs.pop("xlim", rangex)
+        self._ylim = kwargs.pop("ylim", rangey)
+        self._zlim = kwargs.pop("ylim", rangez)
+
+        # Saving keyword arguments
         super().__init__(**kwargs)
 
 
@@ -1605,38 +1668,12 @@ class MatplotlibBackend(BaseBackend):
                     or (s.cmap == None and not "color" in s.kwargs)
                 ):
                     s.kwargs["cmap"] = getattr(self.cm, "viridis", self.cm.jet)
-                kwargs = {}
-                for arg in s.kwargs:
-                    if arg in [
-                        "rstride",
-                        "cstride",
-                        "shade",
-                        "vmax",
-                        "vmin",
-                        "norm",
-                        "facecolors",
-                        "cmap",
-                        "color",
-                        "ccount",
-                        "rcount",
-                        "edgecolors",
-                        "linewidths",
-                        "antialiaseds",
-                        "offsets",
-                        "transOffset",
-                        "alpha",
-                        "edgecolor",
-                        "facecolor",
-                        "sort_zpos",
-                        "zsort",
-                    ]:
-                        kwargs[arg] = s.kwargs[arg]
 
                 collection = ax.plot_surface(
                     x,
                     y,
                     z,
-                    **kwargs,
+                    **s.kwargs,
                 )
                 if isinstance(s.surface_color, (float, int, Callable)):
                     color_array = s.get_color_array()
@@ -1667,6 +1704,7 @@ class MatplotlibBackend(BaseBackend):
                     else:
                         ax.contourf(xarray, yarray, zarray, cmap=colormap)
             elif s.is_2Dscatter:
+
                 ax.scatter(s.x, s.y, **s.kwargs)
                 xlims.append(s._xlim)
                 ylims.append(s._ylim)
@@ -1675,6 +1713,16 @@ class MatplotlibBackend(BaseBackend):
                 xlims.append(s._xlim)
                 ylims.append(s._ylim)
                 zlims.append(s._zlim)
+            elif s.is_2Dquiver or s.is_3Dquiver:
+
+                ax.quiver(*s.start, *s.direction, **s.kwargs)
+                xlims.append(s._xlim)
+                ylims.append(s._ylim)
+                zlims.append(s._zlim)
+            elif s.is_3Dquiver:
+                ax.quiver(*s.start, *s.direction, **s.kwargs)
+                xlims.append(s._xlim)
+                ylims.append(s._ylim)
             else:
                 raise NotImplementedError(
                     "{} is not supported in the SymPy plotting module "
@@ -1778,18 +1826,18 @@ class MatplotlibBackend(BaseBackend):
         # xlim and ylim shoulld always be set at last so that plot limits
         # doesn't get altered during the process.
         if not isinstance(ax, Axes3D):
-            if parent.xlim:
-                ax.set_xlim(parent.xlim)
-            # if xlims:
-            #     xlims = np.array(xlims)
-            #     xlim = (np.amin(xlims[:, 0]), np.amax(xlims[:, 1]))
-            #     ax.set_xlim(xlim)
-            if parent.ylim:
-                ax.set_ylim(parent.ylim)
-            # if ylims:
-            #     ylims = np.array(ylims)
-            #     ylim = (np.amin(ylims[:, 0]), np.amax(ylims[:, 1]))
-            #     ax.set_ylim(ylim)
+            # if parent.xlim:
+            #     ax.set_xlim(parent.xlim)
+            if xlims:
+                xlims = np.array(xlims)
+                xlim = (np.amin(xlims[:, 0]), np.amax(xlims[:, 1]))
+                ax.set_xlim(xlim)
+            # if parent.ylim:
+            #     ax.set_ylim(parent.ylim)
+            if ylims:
+                ylims = np.array(ylims)
+                ylim = (np.amin(ylims[:, 0]), np.amax(ylims[:, 1]))
+                ax.set_ylim(ylim)
         if parent.axis_equal:
             xl, xh = ax.get_xlim()
             yl, yh = ax.get_ylim()
@@ -1956,6 +2004,55 @@ def _matplotlib_list(interval_list):
 # TODO: Add color arrays for plots.
 # TODO: Add more plotting options for 3d plots.
 # TODO: Adaptive sampling for 3D plots.
+
+
+def split_kwargs(kwargs, legal_kwargs):
+    warnings = import_module("warnings")
+
+    def warning_formatter(msg, *args, line=None, **kwargs):
+        return str(msg)
+
+    warnings.formatwarning = warning_formatter
+
+    # class kwWarning(UserWarning):
+    #     return
+
+    plot_kwargs_list = [
+        "title",
+        "xlabel",
+        "ylabel",
+        "zlabel",
+        "aspect_ratio",
+        "xlim",
+        "ylim",
+        "axis_center",
+        "axis",
+        "xscale",
+        "yscale",
+        "legend",
+        "autoscale",
+        "axis_equal",
+        "margin",
+        "annotations",
+        "markers",
+        "rectangles",
+        "fill",
+        "backend",
+        "size",
+    ]
+
+    kwargs_series = {}
+    kwargs_plot = {}
+
+    for key in kwargs:
+        if key in legal_kwargs:
+            kwargs_series[key] = kwargs[key]
+        elif key in plot_kwargs_list:
+            kwargs_plot[key] = kwargs[key]
+        else:
+            warnings.warn(f"Unknown keyword argument found and ignored: {key}")
+
+    return kwargs_series, kwargs_plot
 
 
 def plot(*args, show=True, **kwargs):
@@ -2619,12 +2716,40 @@ def plot3d(*args, show=True, **kwargs):
     args = list(map(sympify, args))
     series = []
     plot_expr = check_arguments(args, 1, 2)
+
+    # Check and split kwargs
     axis_equal = kwargs.pop("axis_equal", False)
-    series = [SurfaceOver2DRangeSeries(*arg, **kwargs) for arg in plot_expr]
-    kwargs.setdefault("xlabel", series[0].var_x)
-    kwargs.setdefault("ylabel", series[0].var_y)
-    kwargs.setdefault("zlabel", Function("f")(series[0].var_x, series[0].var_y))
-    plots = Plot(*series, axis_equal=axis_equal, **kwargs)
+    kwargs_series, kwargs_plot = split_kwargs(
+        kwargs,
+        legal_kwargs=[
+            "rstride",
+            "cstride",
+            "shade",
+            "vmax",
+            "vmin",
+            "norm",
+            "facecolors",
+            "cmap",
+            "color",
+            "ccount",
+            "rcount",
+            "edgecolors",
+            "linewidths",
+            "antialiaseds",
+            "offsets",
+            "transOffset",
+            "alpha",
+            "edgecolor",
+            "facecolor",
+            "sort_zpos",
+            "zsort",
+        ],
+    )
+    series = [SurfaceOver2DRangeSeries(*arg, **kwargs_series) for arg in plot_expr]
+    kwargs_plot.setdefault("xlabel", series[0].var_x)
+    kwargs_plot.setdefault("ylabel", series[0].var_y)
+    kwargs_plot.setdefault("zlabel", Function("f")(series[0].var_x, series[0].var_y))
+    plots = Plot(*series, axis_equal=axis_equal, **kwargs_plot)
     if show:
         plots.show()
     return plots
@@ -2953,7 +3078,10 @@ def scatter(*args, show=True, **kwargs):
         np.array(arg, dtype=float).flatten() if (not type(arg) == np.ndarray) else arg
         for arg in args
     ]
+
+    # check and split kwargs
     axis_equal = kwargs.pop("axis_equal", False)
+
     if len(args) == 2:
         series = Scatter2dSeries(*args, **kwargs)
     elif len(args) == 3:
@@ -2966,3 +3094,109 @@ def scatter(*args, show=True, **kwargs):
     if show:
         scatter_plot.show()
     return scatter_plot
+
+
+def quiver(*args, show=True, **kwargs):
+
+    np = import_module("numpy")
+
+    if len(args) == 4:
+        args = [[args[0], args[1]], [args[2], args[3]]]
+    if len(args) == 6:
+        args = [[args[0], args[1], args[2]], [args[3], args[4], args[5]]]
+
+    assert len(args) in [
+        2,
+        3,
+    ], f"Error! Expected 2 or 3 arguments for quiver, but got {len(args)}!"
+
+    try:
+        args = np.array(args, dtype=float)
+        assert args.shape[-1] in [2, 3]
+    except:
+        raise f"Error! Wrong format used in quiver. \
+        Got {args[0]} as starting point(s) and {args[1]} as ending point(s)!"
+
+    # want structure to be [list of starts, list of ends]
+    # where list of starts could be [start1, start2, ...], either 2D or 3D points
+    if len(args.shape) == 2:
+        args = args[:, None, :]
+
+    # check and split kwargs
+    axis_equal = kwargs.pop("axis_equal", False)
+    kwargs_series, kwargs_plot = split_kwargs(
+        kwargs,
+        legal_kwargs=[
+            "angles",
+            "pivot",
+            "scale",
+            "scale_units",
+            "units",
+            "width",
+            "headwidth",
+            "headlength",
+            "headaxislength",
+            "minshaft",
+            "minlength",
+            "color",
+            "agg_filter",
+            "alpha",
+            "animated",
+            "antialiased",
+            "array",
+            "capstyle",
+            "clim",
+            "clip_box",
+            "clip_on",
+            "clip_path",
+            "cmap",
+            "edgecolor",
+            "facecolor",
+            "figure",
+            "gid",
+            "hatch",
+            "in_layout",
+            "joinstyle",
+            "label",
+            "linestyle",
+            "linewidth",
+            "mouseover",
+            "norm",
+            "offset_transform",
+            "offsets",
+            "path_effects",
+            "paths",
+            "picker",
+            "pickradius",
+            "rasterized",
+            "sizes",
+            "sketch_params",
+            "snap",
+            "transform",
+            "url",
+            "urls",
+            "verts",
+            "verts_and_codes",
+            "visible",
+            "zorder",
+        ],
+    )
+
+    if args.shape[-1] == 2:
+        kwargs_series.setdefault("angles", "xy")
+        kwargs_series.setdefault("scale_units", "xy")
+        kwargs_series.setdefault("scale", 1)
+        series = [
+            Quiver2dSeries(start, stop, **kwargs_series)
+            for start, stop in zip(args[0, :, :], args[1, :, :])
+        ]
+    elif args.shape[-1] == 3:
+        series = [
+            Quiver3dSeries(start, stop, **kwargs_series)
+            for start, stop in zip(args[0, :, :], args[1, :, :])
+        ]
+
+    quiver_plot = Plot(*series, axis_equal=axis_equal, **kwargs_plot)
+    if show:
+        quiver_plot.show()
+    return quiver_plot
