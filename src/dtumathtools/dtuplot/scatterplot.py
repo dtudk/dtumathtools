@@ -1,3 +1,4 @@
+from sympy import Matrix
 from sympy.external import import_module
 from spb.functions import plot_list, plot3d_list
 
@@ -15,6 +16,8 @@ def scatter(*args, **kwargs):
     # format all arguments
     dim = 0
     args = list(args)
+    otherargs = []
+    matrixlist = []
     for i in range(len(args)):
         if type(args[i]) in (list, tuple):
             args[i] = np.array(args[i])
@@ -29,6 +32,29 @@ def scatter(*args, **kwargs):
         elif type(args[i]) in [float, int]:
             args[i] = np.array([args[i]])
             dim += 1
+        elif type(args[i]) == type(Matrix()):
+            matrixlist.append(args[i])
+        else:
+            otherargs.append(args[i])
+
+    # if entries are matricies, get them into right format
+    if len(matrixlist) > 0:
+        assert dim == 0, "Cannot mix matrix and non-matrix arguments!"
+        firstshape = matrixlist[0].shape
+        assert len(firstshape) in [1, 2], "Matrix must be 1D or 2D!"
+        assert (
+            min(firstshape) == 1
+        ), "Matrix must not have multiple dimensions different from size 1!"
+        dim = max(firstshape)
+        newargs = [np.array([])] * dim
+        for i in range(len(matrixlist)):
+            assert (
+                matrixlist[i].shape == firstshape
+            ), "All matrices must have the same shape!"
+            for j in range(len(matrixlist[i])):
+                newargs[j] = np.append(newargs[j], matrixlist[i][j])
+        args = newargs
+        args.extend(otherargs)
 
     assert dim in [2, 3], "scatterplot only supports 2D and 3D plots"
     if dim == 2:

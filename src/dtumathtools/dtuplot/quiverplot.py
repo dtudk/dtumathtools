@@ -1,4 +1,4 @@
-from sympy import latex
+from sympy import latex, Matrix
 from sympy.external import import_module
 from spb.backends.base_backend import Plot as BP
 from spb.defaults import TWO_D_B, THREE_D_B, cfg
@@ -21,7 +21,7 @@ class ArrowSeries(BaseSeries):
     is_streamlines = False
     _allowed_keys = []
 
-    def __init__(self, start, direction, label, **kwargs):
+    def __init__(self, start, direction, label=None, **kwargs):
 
         self.start = start
         self.direction = direction
@@ -65,56 +65,89 @@ def quiver(*args, **kwargs):
 
     np = import_module("numpy")
 
-    if len(args) == 4:
-        args = [[args[0], args[1]], [args[2], args[3]]]
-    if len(args) == 6:
-        args = [[args[0], args[1], args[2]], [args[3], args[4], args[5]]]
+    # format if numbers are entered directly instead of lists
+    num_single = 0
+    for i in range(len(args)):
+        if type(args[i]) in [int, float]:
+            num_single += 1
+        else:
+            break
+    if num_single == 4:
+        if len(args) > 4:
+            args = [[args[0], args[1]], [args[2], args[3]], *args[4:]]
+        else:
+            args = [[args[0], args[1]], [args[2], args[3]]]
+    elif num_single == 6:
+        if len(args) > 6:
+            args = [[args[0], args[1], args[2]], [args[3], args[4], args[5]], *args[6:]]
+        else:
+            args = [[args[0], args[1], args[2]], [args[3], args[4], args[5]]]
+    elif num_single != 0:
+        raise f"Error! Wrong format used in quiver. Got {num_single} arguments \
+            that could be start or direction vector coordinates!"
 
-    assert len(args) in [
-        2,
-        3,
-    ], f"Error! Expected 2 or 3 arguments for quiver, but got {len(args)}!"
+    # split arguments into vectors and other arguments
+    point_args = []
+    otherargs = []
+    for i in range(len(args)):
+        if type(args[i]) in [list, np.ndarray, tuple, type(Matrix())]:
+            newpoint = np.array(args[i]).flatten()
+            point_args.append(newpoint)
+        elif type(args[i]) == dict:
+            kwargs.setdefault("rendering_kw", args[i])
+        else:
+            otherargs.append(args[i])
+    assert (
+        len(point_args) == 2
+    ), f"Error! Start and direction vectors must be provided (only two vectors)!"
 
     try:
-        args = np.array(args, dtype=float)
-        assert args.shape[-1] in [2, 3]
+        point_args = np.array(point_args, dtype=float)
+        assert point_args.shape[-1] in [
+            2,
+            3,
+        ], "Error! Start and direction vectors must be 2D or 3D!"
+        args = otherargs
     except:
         raise f"Error! Wrong format used in quiver. \
-        Got {args[0]} as starting point(s) and {args[1]} as ending point(s)!"
+        Got {point_args[0]} as starting point(s) and {point_args[1]} as ending point(s)!"
 
     # want structure to be [list of starts, list of ends]
     # where list of starts could be [start1, start2, ...], either 2D or 3D points
-    if len(args.shape) == 2:
-        args = args[:, None, :]
+    if len(point_args.shape) == 2:
+        point_args = point_args[:, None, :]
 
     labels = kwargs.pop("label", [])
-    assert type(labels) == list, f"Error! Label must be a list!"
+    if type(labels) == str:
+        labels = [labels]
+    assert type(labels) == list, f"Error! Label must be a list or a string!"
     assert len(labels) in [
         0,
-        args.shape[1],
+        point_args.shape[1],
     ], f"Error! Number of labels must be equal to number of arrows, or empty list!"
     if labels == []:
-        labels = [None] * args.shape[1]
+        labels = [None] * point_args.shape[1]
 
     kwargs.setdefault("legend", True)
     params = kwargs.get("params", None)
     is_interactive = False if params is None else True
     kwargs["is_interactive"] = is_interactive
     if is_interactive:
+        raise NotImplementedError("Interactive quiver plots are not yet implemented!")
         from spb.interactive import iplot
 
         kwargs["is_vector"] = True
         return iplot(*args, **kwargs)
 
     series = [
-        ArrowSeries(start, stop, label=label, **kwargs)
-        for start, stop, label in zip(args[0, :, :], args[1, :, :], labels)
+        ArrowSeries(start, stop, *otherargs, label=label, **kwargs)
+        for start, stop, label in zip(point_args[0, :, :], point_args[1, :, :], labels)
     ]
 
     rendering_kw = kwargs.pop("rendering_kw", None)
 
     # if 2D
-    if args.shape[-1] == 2:
+    if point_args.shape[-1] == 2:
         Backend = kwargs.pop("backend", TWO_D_B)
         for i in range(len(series)):
             series[i].rendering_kw["angles"] = "xy"
@@ -127,4 +160,12 @@ def quiver(*args, **kwargs):
             series[i].is_3Dvector = True
 
     _set_labels(series, labels, rendering_kw)
-    return _instantiate_backend(Backend, *series, **kwargs)
+
+    # if multiple arrows are given, plot them all in one plot
+    show = kwargs.pop("show", True)
+    B = _instantiate_backend(Backend, series[0], show=False, **kwargs)
+    for i in range(1, len(series)):
+        B.extend(_instantiate_backend(Backend, series[i], show=False, **kwargs))
+    if show:
+        B.show()
+    return B
