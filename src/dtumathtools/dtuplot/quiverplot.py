@@ -30,7 +30,7 @@ class ArrowSeries(BaseSeries):
         self._latex_label = latex(f"{start}->{direction}") if label is None else label
 
         self.expr = kwargs.get("expr", "")
-        self.use_cm = kwargs.get("use_cm", True)
+        self.use_cm = kwargs.get("use_cm", False)
         self.color_func = kwargs.get("color_func", None)
         # NOTE: normalization is achieved at the backend side: this allows to
         # obtain same length arrows, but colored with the actual magnitude.
