@@ -67,11 +67,16 @@ def quiver(*args, **kwargs):
 
     # format if numbers are entered directly instead of lists
     num_single = 0
+    args = list(args)
     for i in range(len(args)):
         if type(args[i]) in [int, float]:
             num_single += 1
         else:
-            break
+            try:
+                args[i] = float(args[i])
+                num_single += 1
+            except:
+                break
     if num_single == 4:
         if len(args) > 4:
             args = [[args[0], args[1]], [args[2], args[3]], *args[4:]]

@@ -35,7 +35,12 @@ def scatter(*args, **kwargs):
         elif type(args[i]) == type(Matrix()):
             matrixlist.append(args[i])
         else:
-            otherargs.append(args[i])
+            try:
+                # symbolic expression not multiplied fully
+                args[i] = np.array([float(args[i])])
+                dim += 1
+            except:
+                otherargs.append(args[i])
 
     # if entries are matricies, get them into right format
     if len(matrixlist) > 0:
@@ -58,6 +63,10 @@ def scatter(*args, **kwargs):
 
     assert dim in [2, 3], "scatterplot only supports 2D and 3D plots"
     if dim == 2:
-        return plot_list(*args, is_point=True, **kwargs)
+        rendering_kw = kwargs.pop("rendering_kw", {})
+        markersize = rendering_kw.pop("s", None)
+        if markersize is not None:
+            rendering_kw.setdefault("markersize", markersize)
+        return plot_list(*args, is_point=True, rendering_kw=rendering_kw, **kwargs)
     else:
         return plot3d_list(*args, is_point=True, **kwargs)
