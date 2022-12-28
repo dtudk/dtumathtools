@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=61.0", "sympy-plot-backends>=1.6", "sympy>=1.10.1", "matplotlib>=3.2", "jupyter>=1.0.0", "numpy>=1.21.1,<1.24", "PyQt5>=5.15.7"]
+requires = ["setuptools>=61.0", "sympy-plot-backends>=1.6.6", "sympy>=1.10.1", "matplotlib>=3.2", "jupyter>=1.0.0", "numpy>=1.21.1,<1.24", "PyQt5>=5.15.7"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "dtumathtools"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
     {name = "Christian Mikkelstrup", email = "s194345@student.dtu.dk"},
     {name = "Hans Henrik Hermansen", email = "s194042@student.dtu.dk"},
@@ -18,7 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Education",
     "Topic :: Education",
     "Topic :: Scientific/Engineering :: Mathematics",
