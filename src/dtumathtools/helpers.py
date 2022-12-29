@@ -41,8 +41,8 @@ def hessian(expr, var=None):
 
 def _extract_field_vars(V, var, namefunc):
     var = _extract_vars(V) if var is None else var
-    x, y, z = symbols("x,y,z")
-    if len(var) < 3 and all([f in [x, y, z] for f in var]):
+    if len(var) < 3 and all([f in ["x", "y", "z"] for f in var]):
+        x, y, z = symbols("x,y,z")
         var = [x, y, z]
     elif len(var) != 3:
         raise Exception(
