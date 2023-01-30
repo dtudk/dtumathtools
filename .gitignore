@@ -2,3 +2,5 @@ dist/
 src/dtumathtools/__pycache__
 src/dtumathtools.egg-info
 *__pycache__
+.vscode
+src/.vscode

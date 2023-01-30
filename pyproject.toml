@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dtumathtools"
-version = "0.0.3"
+version = "1.0"
 authors = [
     {name = "Christian Mikkelstrup", email = "s194345@student.dtu.dk"},
     {name = "Hans Henrik Hermansen", email = "s194042@student.dtu.dk"},
@@ -18,7 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Education",
     "Topic :: Education",
     "Topic :: Scientific/Engineering :: Mathematics",
@@ -34,5 +34,5 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://gitlab.com/dtumath/dtumathtools"
+"Homepage" = "https://github.com/Chrillebon/DTUMathTools"
 "Mathematics 1 homepage" = "https://01005.compute.dtu.dk/"
