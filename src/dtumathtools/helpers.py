@@ -3,7 +3,7 @@ from functools import reduce
 
 
 def _extract_vars(expr):
-    return sorted(list(map(str, expr.free_symbols)))
+    return [e[1] for e in sorted(list(map(lambda x: (str(x),x), expr.free_symbols)))]
 
 
 def taylor(expr, vars, degree):
