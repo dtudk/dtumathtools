@@ -53,13 +53,15 @@ def _extract_field_vars(V, var, namefunc):
 
 
 def div(V, var=None):
-    var = _extract_field_vars(V, var, "div")
+    if var is None:
+        var = _extract_field_vars(V, var, "div")
 
     return sum([V[i].diff(f) for i, f in enumerate(var)])
 
 
 def rot(V, var=None):
-    var = _extract_field_vars(V, var, "rot")
+    if var is None:
+        var = _extract_field_vars(V, var, "rot")
 
     return Matrix(
         [
