@@ -40,6 +40,7 @@ def hessian(expr, var=None):
 
 
 def _extract_field_vars(V, var, namefunc):
+    return _extract_vars(V) if var is None else var
     var = _extract_vars(V) if var is None else var
     if len(var) < 3 and all([f in ["x", "y", "z"] for f in var]):
         x, y, z = symbols("x,y,z")
@@ -53,15 +54,12 @@ def _extract_field_vars(V, var, namefunc):
 
 
 def div(V, var=None):
-    if var is None:
-        var = _extract_field_vars(V, var, "div")
-
+    var = _extract_field_vars(V, var, "div")
     return sum([V[i].diff(f) for i, f in enumerate(var)])
 
 
 def rot(V, var=None):
-    if var is None:
-        var = _extract_field_vars(V, var, "rot")
+    var = _extract_field_vars(V, var, "rot")
 
     return Matrix(
         [
@@ -78,9 +76,14 @@ if __name__ == "__main__":
     V = Matrix([-y, x, 1])
     print(div(U))
     print(div(V))
-
-    ## Example 2
-    U = Matrix([x, y, z])
-    V = Matrix([-y, x, 1])
     print(div(U, var=[x, y, z]))
     print(div(V, var=[x, y]))
+
+    ## Example 2
+    u, v, w = symbols("u v w")
+    W = Matrix([u, v, w])
+    X = Matrix([-v, u, 1])
+    print(div(W))
+    print(div(X))
+    print(div(W, var=[u, v, w]))
+    print(div(X, var=[u, v]))
