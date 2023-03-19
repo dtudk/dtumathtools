@@ -2,6 +2,9 @@ from dtumathtools import *
 from sympy import *
 import pytest
 
+# remove sympy variable named "test"
+del test
+
 def test_taylor():
     x,y = symbols("x y")
     f =  x**3 - 3 * x**2 + y**3 - 3 * y**2
