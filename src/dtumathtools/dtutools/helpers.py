@@ -41,14 +41,12 @@ def hessian(expr, var=None):
 
 def _extract_field_vars(V, var, namefunc):
     var = _extract_vars(V) if var is None else var
-    if len(var) < 3 and all([f in ["x", "y", "z"] for f in var]):
-        x, y, z = symbols("x,y,z")
-        var = [x, y, z]
-    elif len(var) != 3:
-        raise Exception(
-            f"{namefunc} found the variables {var}, but expected 3 variables. \
-            Try specifying the variables using the 'var' keyword argument like: {namefunc}(V, var=(x,y,z))."
-        )
+    
+    # if 3 variables cannot be found, dummy variable is returned,
+    # such that differentiating wrt. to it results in 0.
+    while len(var) < 3:
+        var.append(symbols("_dummy"))
+        
     return var
 
 
