@@ -42,6 +42,7 @@ def hessian(expr, var=None):
 def _extract_field_vars(V, var, namefunc):
     return _extract_vars(V) if var is None else var
 
+
 def div(V, var=None):
     var = _extract_field_vars(V, var, "div")
     return sum([V[i].diff(f) for i, f in enumerate(var)])
