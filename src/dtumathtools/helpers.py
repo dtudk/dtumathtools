@@ -46,8 +46,8 @@ def _extract_field_vars(V, var, namefunc):
         var = [x, y, z]
     elif len(var) != 3:
         raise Exception(
-            f"{namefunc} found the variables {var}, but expected 3 variables. \
-            Try specifying the variables using the 'var' keyword argument like: {namefunc}(V, var=(x,y,z))."
+            f"{namefunc} found the variables {var}, but expected 3 variables. \n" +
+            f"Try specifying the variables using the 'var' keyword argument like: {namefunc}(V, var=(x,y,z))."
         )
     return var
 
@@ -70,3 +70,17 @@ def rot(V, var=None):
             V[1].diff(var[0]) - V[0].diff(var[1]),
         ]
     )
+
+if __name__ == "__main__":
+    x, y, z = symbols("x y z")
+    ## Example 1
+    U = Matrix([x, y, z])
+    V = Matrix([-y, x, 1])
+    print(div(U))
+    print(div(V))
+
+    ## Example 2
+    U = Matrix([x, y, z])
+    V = Matrix([-y, x, 1])
+    print(div(U, var=[x, y, z]))
+    print(div(V, var=[x, y]))
