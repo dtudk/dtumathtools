@@ -3,4 +3,9 @@ sympy>=1.10.1
 matplotlib>=3.2
 jupyter>=1.0.0
 numpy>=1.21.1,<1.24
-PyQt5>=5.15.7
+
+# --- Packages related to different backends ---
+# PyQt5>=5.15.7
+# plotly>=4.14.3
+# ipympl>=0.7.0
+# mayavi>=4.8.0

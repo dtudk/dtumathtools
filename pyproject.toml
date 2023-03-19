@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dtumathtools"
-version = "1.0"
+version = "1.0.3"
 authors = [
     {name = "Christian Mikkelstrup", email = "s194345@student.dtu.dk"},
     {name = "Hans Henrik Hermansen", email = "s194042@student.dtu.dk"},
@@ -29,8 +29,7 @@ dependencies = [
     "sympy>=1.10.1", 
     "matplotlib>=3.2", 
     "jupyter>=1.0.0", 
-    "numpy>=1.21.1,<1.24", 
-    "PyQt5>=5.15.7"
+    "numpy>=1.21.1,<1.24"
 ]
 
 [project.urls]
