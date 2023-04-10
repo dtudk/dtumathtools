@@ -1,6 +1,6 @@
 from sympy import *
 from functools import reduce
-
+from typing import Union
 
 def _extract_vars(expr):
     return [e[1] for e in sorted(list(map(lambda x: (str(x),x), expr.free_symbols)))]
@@ -68,7 +68,7 @@ def rot(V, var=None):
     )
 
 
-def dsolve(ODE: Eq | list | Matrix, ics=None) -> dict:
+def dsolve(ODE: Union[Eq, list, Matrix], ics=None) -> dict:
     """ A wrapper for the sympy dsolve-function. Instead of a list of equations
         denoting the solution, this function returns a dictionary of solutions.
 
