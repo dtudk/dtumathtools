@@ -66,3 +66,37 @@ def rot(V, var=None):
             V[1].diff(var[0]) - V[0].diff(var[1]),
         ]
     )
+
+
+def dsolve(ODE: Eq | list | Matrix, ics=None) -> dict:
+    """ A wrapper for the sympy dsolve-function. Instead of a list of equations
+        denoting the solution, this function returns a dictionary of solutions.
+
+        // This makes it easier to substitute solution in the places it's needed
+
+        ## Input:
+            ODE: one or multiple differential equations to be solved by sympy
+
+        ## Returns:
+            sol: a dictionary containing solutions to 'ODE'
+        
+    """
+    
+    # Common problem for people is making an single equation, but with both sides
+    # being Matrices. This alleviates that issue, and lets users think less
+    if type(ODE) == Eq and type(ODE.lhs) == type(ODE.rhs) == Matrix:
+            sol = dsolve(ODE.lhs - ODE.rhs, ics=ics)
+    else:
+        sol = dsolve(ODE, ics=ics)
+
+    return {eq.lhs : eq.rhs for eq in sol}
+
+
+def l2_norm( v: Matrix ):
+    """ Computes the l2-norm for a Matrix-class object, without using
+        absolute values on entries, for easier simplification and integration
+
+        ## Input:
+            v: A sympy Matrix
+    """
+    return sqrt(sum(x**2 for x in v))

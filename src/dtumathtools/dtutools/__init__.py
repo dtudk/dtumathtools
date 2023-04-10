@@ -1,1 +1,1 @@
-from .helpers import taylor, gradient, hessian, div, rot
+from .helpers import taylor, gradient, hessian, div, rot, dsolve, l2_norm
