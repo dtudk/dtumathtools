@@ -1,4 +1,4 @@
-sympy-plot-backends>=1.6.6
+sympy-plot-backends>=1.6.6,<=1.6.7
 sympy>=1.10.1
 matplotlib>=3.2
 jupyter>=1.0.0
