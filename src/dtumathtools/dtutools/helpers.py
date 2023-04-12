@@ -85,7 +85,7 @@ def dsolve(ODE: Union[Eq, list, Matrix], ics=None) -> dict:
     
     # Common problem for people is making an single equation, but with both sides
     # being Matrices. This alleviates that issue, and lets users think less
-    if type(ODE) == Eq and type(ODE.lhs) == type(ODE.rhs) == Matrix:
+    if type(ODE) == Eq and isinstance(ODE.lhs, MatrixBase) and isinstance(ODE.rhs, MatrixBase):
             sol = sym_dsolve(ODE.lhs - ODE.rhs, ics=ics)
     else:
         sol = sym_dsolve(ODE, ics=ics)
