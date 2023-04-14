@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=58.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "dtumathtools"
-version = "1.0.4"
+version = "1.0.5"
 authors = [
     {name = "Christian Mikkelstrup", email = "s194345@student.dtu.dk"},
     {name = "Hans Henrik Hermansen", email = "s194042@student.dtu.dk"},
@@ -22,14 +22,6 @@ classifiers = [
     "Intended Audience :: Education",
     "Topic :: Education",
     "Topic :: Scientific/Engineering :: Mathematics",
-]
-
-dependencies = [
-    "sympy-plot-backends>=1.6.6", 
-    "sympy>=1.10.1", 
-    "matplotlib>=3.2", 
-    "jupyter>=1.0.0", 
-    "numpy>=1.21.1,<1.24"
 ]
 
 [project.urls]

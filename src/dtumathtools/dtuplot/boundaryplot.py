@@ -6,7 +6,7 @@ def plot_boundary(param_func: Matrix, *args, **kwargs):
         area
         
         ## Input:
-            param_func: A matrix with functions [x(t), y(t)] determining 
+            param_func: A matrix with functions [x(u,v), y(u,v)] determining 
                         x and y-coordinates of area to be plotted
             (u, u_min, u_max): A tuple with variable and its limits either as list or two seperate values
             (v, v_min, v_max): Same as above but for other variable

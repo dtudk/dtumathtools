@@ -4,3 +4,6 @@ src/dtumathtools.egg-info
 *__pycache__
 .vscode
 src/.vscode
+.conda
+build/
+*egg-info
