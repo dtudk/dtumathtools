@@ -1,4 +1,5 @@
 from sympy import *
+from sympy import dsolve as sym_dsolve
 from functools import reduce
 from typing import Union
 
@@ -84,10 +85,10 @@ def dsolve(ODE: Union[Eq, list, Matrix], ics=None) -> dict:
     
     # Common problem for people is making an single equation, but with both sides
     # being Matrices. This alleviates that issue, and lets users think less
-    if type(ODE) == Eq and type(ODE.lhs) == type(ODE.rhs) == Matrix:
-            sol = dsolve(ODE.lhs - ODE.rhs, ics=ics)
+    if type(ODE) == Eq and isinstance(ODE.lhs, MatrixBase) and isinstance(ODE.rhs, MatrixBase):
+            sol = sym_dsolve(ODE.lhs - ODE.rhs, ics=ics)
     else:
-        sol = dsolve(ODE, ics=ics)
+        sol = sym_dsolve(ODE, ics=ics)
 
     return {eq.lhs : eq.rhs for eq in sol}
 
