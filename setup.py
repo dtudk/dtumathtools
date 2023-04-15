@@ -45,7 +45,9 @@ setup(
         "Topic :: Education",
         "Topic :: Scientific/Engineering :: Mathematics",
     ],
-    packages=find_packages(),
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
+    include_package_data=True,
     python_requires=">=3.8",
     install_requires=_minimal_deps,
     extras_require={
