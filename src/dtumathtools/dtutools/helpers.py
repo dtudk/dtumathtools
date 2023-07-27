@@ -2,6 +2,7 @@ from sympy import *
 from sympy import dsolve as sym_dsolve
 from functools import reduce
 from typing import Union
+import warnings
 
 def _extract_vars(expr):
     return [e[1] for e in sorted(list(map(lambda x: (str(x),x), expr.free_symbols)))]
@@ -41,12 +42,22 @@ def hessian(expr, var=None):
 
 
 def _extract_field_vars(V, var, namefunc):
-    var = _extract_vars(V) if var is None else var
     
-    # if 3 variables cannot be found, dummy variable is returned,
-    # such that differentiating wrt. to it results in 0.
-    while len(var) < 3:
-        var.append(symbols("_dummy"))
+    if var is None:
+        var = _extract_vars(V)
+        
+        _x,_y,_z = symbols("x,y,z")
+        _u,_v,_w = symbols("u,v,w")
+        
+        assert all(v in [_x,_y,_z,_u,_v,_w] for v in var), f"ERROR! Could not guess the variables used. Please specify the variables using {namefunc}(V, var=[x,y,z])."
+        
+        if all(v in [_x,_y,_z] for v in var):
+            var = [_x,_y,_z]
+        if all(v in [_u,_v,_w] for v in var):
+            var = [_u,_v,_w]
+        warnings.warn("Warning! Variables were not specified. Assuming variables are {var}!", UserWarning)
+    
+    assert len(var) == 3, "Exactly 3 variables must be specified!"
         
     return var
 

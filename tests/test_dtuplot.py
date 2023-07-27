@@ -33,7 +33,10 @@ def test_boundary():
     assert p0._series[0].is_point == False
     assert p0._series[0].is_polar == False
     assert p0._series[0].is_filled == True
-    assert p0._series[0].scale == "linear"
+    assert p0._series[0].only_integers == False
+    assert p0._series[0].show_in_legend == True
+    assert p0._series[0].adaptive == False
+    assert p0._series[0]._scales == ["linear", "linear", "linear"]
     assert p0._series[0]._label == "v"
     assert p0._series[0].expr_x == -1.5
     assert p0._series[0].expr_y == 0.25*v

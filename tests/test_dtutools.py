@@ -1,5 +1,6 @@
 from dtumathtools import *
 from sympy import *
+import warnings
 
 # remove sympy variable named "test"
 test = 0
@@ -34,12 +35,31 @@ def test_div():
     x, y, z = symbols("x y z")
     V = Matrix([x * y * sin(z), x * ln(y), -x * y * z**3])
 
-    assert dtutools.div(V) == -3 * x * y * z**2 + x / y + y * sin(z)
+    assert dtutools.div(V, var=[x,y,z]) == -3 * x * y * z**2 + x / y + y * sin(z)
 
     u, v, w = symbols("u v w")
     V2 = Matrix([u, w**2, u * sin(w)])
 
     assert dtutools.div(V2, var=[u, v, w]) == u * cos(w) + 1
+
+def test_warnings():
+    
+    x, y, z = symbols("x y z")
+    V = Matrix([x * y * sin(z), x * ln(y), -x * y * z**3])
+    
+    u, v, w = symbols("u v w")
+    V2 = Matrix([u, w**2, u * sin(w)])
+    
+    
+    with warnings.catch_warnings(record=True) as w:
+        # Cause all warnings to always be triggered.
+        warnings.simplefilter("always")
+        # Trigger a warning.
+        dtutools.div(V)
+        # Verify some things
+        assert len(w) == 1
+        assert issubclass(w[-1].category, UserWarning)
+        assert "Warning! Variables were not specified. Assuming variables are" in str(w[-1].message)
 
 
 def test_rot():
