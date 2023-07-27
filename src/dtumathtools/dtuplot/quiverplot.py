@@ -1,16 +1,9 @@
 from sympy import latex, Matrix
 from sympy.external import import_module
-from spb.backends.base_backend import Plot as BP
-from spb.defaults import TWO_D_B, THREE_D_B, cfg
+from spb.defaults import TWO_D_B, THREE_D_B
 from spb.functions import _set_labels
 from spb.series import BaseSeries
-from spb.utils import (
-    _plot_sympify,
-    _unpack_args_extended,
-    _split_vector,
-    _is_range,
-    _instantiate_backend,
-)
+from spb.utils import _instantiate_backend
 
 
 class ArrowSeries(BaseSeries):

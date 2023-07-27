@@ -44,6 +44,7 @@ def plot_boundary(param_func: Matrix, *args, **kwargs):
 
         show = kwargs.pop('show', True)
         color = kwargs.pop('color', 'blue')
+        adaptive = kwargs.setdefault('adaptive', False)
         plot = plot_parametric(show=False)
         for i in range(2):
             plot += plot_parametric(*param_func.subs(bounds[i][0], bounds[i][1]),
