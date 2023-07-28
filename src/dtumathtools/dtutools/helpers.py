@@ -49,13 +49,18 @@ def _extract_field_vars(V, var, namefunc):
         _x,_y,_z = symbols("x,y,z")
         _u,_v,_w = symbols("u,v,w")
         
-        assert all(v in [_x,_y,_z,_u,_v,_w] for v in var), f"ERROR! Could not guess the variables used. Please specify the variables using {namefunc}(V, var=[x,y,z])."
+        error_str = f"ERROR! Could not guess the variables used. Please specify the variables using {namefunc}(V, var=[x,y,z])."
+        warning_str = f"Warning! Variables were not specified. Assuming variables are {var}!"
+        assert all(v in [_x,_y,_z,_u,_v,_w] for v in var), error_str
         
         if all(v in [_x,_y,_z] for v in var):
             var = [_x,_y,_z]
-        if all(v in [_u,_v,_w] for v in var):
+            warnings.warn(warning_str, UserWarning)
+        elif all(v in [_u,_v,_w] for v in var):
             var = [_u,_v,_w]
-        warnings.warn("Warning! Variables were not specified. Assuming variables are {var}!", UserWarning)
+            warnings.warn(warning_str, UserWarning)
+        else:
+            raise AssertionError (error_str)
     
     assert len(var) == 3, "Exactly 3 variables must be specified!"
         

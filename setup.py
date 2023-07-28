@@ -30,6 +30,7 @@ _extra_deps = _qt+_ipympl+_plotly+_bokeh+_k3d+_myavi+[
 _dev_deps = _extra_deps + [
     "pytest",
     "flake8",
+    "black",
 ]
 
 setup(
@@ -57,7 +58,7 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     include_package_data=True,
-    python_requires=">=3.8",
+    python_requires=">=3.8,<3.12",
     setup_requires=["setuptools<60.0;python_version<'3.12'"],
     install_requires=_minimal_deps,
     extras_require={
