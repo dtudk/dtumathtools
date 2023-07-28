@@ -1,12 +1,15 @@
-from sympy import latex, Matrix
-from sympy.external import import_module
-from spb.defaults import TWO_D_B, THREE_D_B
+from spb import MB
+from spb.defaults import THREE_D_B, TWO_D_B
 from spb.functions import _set_labels
-from spb.series import BaseSeries
+from spb.series import VectorBase
 from spb.utils import _instantiate_backend
+from sympy import Matrix, latex, symbols
+from sympy.external import import_module
+
+np = import_module("numpy")
 
 
-class ArrowSeries(BaseSeries):
+class ArrowSeries(VectorBase):
     """Represent a vector field."""
 
     is_vector = True
@@ -15,6 +18,10 @@ class ArrowSeries(BaseSeries):
     _allowed_keys = []
 
     def __init__(self, start, direction, label=None, **kwargs):
+        # Ranges must be given for VectorBase, even though they are None
+        super().__init__(
+            [start, direction], ranges=start.shape[-1] * [None], label=label, **kwargs
+        )
 
         self.start = start
         self.direction = direction
@@ -22,42 +29,40 @@ class ArrowSeries(BaseSeries):
         self._label = f"{start}->{direction}" if label is None else label
         self._latex_label = latex(f"{start}->{direction}") if label is None else label
 
-        self.expr = kwargs.get("expr", "")
+        # Standard for 'use_cm' should be False
         self.use_cm = kwargs.get("use_cm", False)
-        self.color_func = kwargs.get("color_func", None)
-        # NOTE: normalization is achieved at the backend side: this allows to
-        # obtain same length arrows, but colored with the actual magnitude.
-        # If normalization is applied on the series get_data(), the coloring
-        # by magnitude would not be applicable at the backend.
-        self.normalize = kwargs.get("normalize", False)
+        # Linked colormap using vector2d renderer
+        self.use_quiver_solid_color = not self.use_cm
 
-        self.rendering_kw = kwargs.get("quiver_kw", kwargs.get("rendering_kw", dict()))
-
-        self._set_use_quiver_solid_color(**kwargs)
-        self._init_transforms(**kwargs)
-
-    def _set_use_quiver_solid_color(self, **kwargs):
-        # NOTE: this attribute will inform the backend wheter to use a
-        # color map or a solid color for the quivers. It is placed here
-        # because it simplifies the backend logic when dealing with
-        # plot sums.
-        self.use_quiver_solid_color = (
-            True
-            if ("scalar" not in kwargs.keys())
-            else (
-                False if (not kwargs["scalar"]) or (kwargs["scalar"] is None) else True
-            )
+    def __str__(self):
+        # Overwrite the VectorBase __str__ as it assumes things
+        # about variables that does not hold for this class.
+        return self._str_helper(
+            f"Arrow Series with start point {self.start}, and direction {self.direction}"
         )
 
     def get_data(self):
+        # This format works for both MB and PB
+        return [np.array([v]) for v in list(self.start) + list(self.direction)]
 
-        return *self.start, *self.direction
+
+# Specify 2D class such that this can be linked with renderer
+class Arrow2DSeries(ArrowSeries):
+    is_2Dvector = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+# Specify 3D class such that this can be linked with renderer
+class Arrow3DSeries(ArrowSeries):
+    is_3Dvector = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
 def quiver(*args, **kwargs):
-
-    np = import_module("numpy")
-
     # format if numbers are entered directly instead of lists
     num_single = 0
     args = list(args)
@@ -127,9 +132,10 @@ def quiver(*args, **kwargs):
         labels = [None] * point_args.shape[1]
 
     kwargs.setdefault("legend", True)
+    # params are directly linked with interactive plots
+    # if present, the BaseSeries will activate the 'is_interactive' flag
     params = kwargs.get("params", None)
     is_interactive = False if params is None else True
-    kwargs["is_interactive"] = is_interactive
     if is_interactive:
         raise NotImplementedError("Interactive quiver plots are not yet implemented!")
         from spb.interactive import iplot
@@ -137,25 +143,35 @@ def quiver(*args, **kwargs):
         kwargs["is_vector"] = True
         return iplot(*args, **kwargs)
 
-    series = [
-        ArrowSeries(start, stop, *otherargs, label=label, **kwargs)
-        for start, stop, label in zip(point_args[0, :, :], point_args[1, :, :], labels)
-    ]
-
+    # rendering_kw needs to be passed to the plotting backend, but not
+    # to the series. Thus pulled out here.
     rendering_kw = kwargs.pop("rendering_kw", None)
+    # normalize argument needs to be passed to series object, but not to
+    # backend. Otherwise warning will be raised. Thus pulled out here.
+    normalize = kwargs.pop("normalize", False)
 
     # if 2D
     if point_args.shape[-1] == 2:
         Backend = kwargs.pop("backend", TWO_D_B)
-        for i in range(len(series)):
-            series[i].rendering_kw["angles"] = "xy"
-            series[i].rendering_kw["scale_units"] = "xy"
-            series[i].rendering_kw["scale"] = 1
-            series[i].is_2Dvector = True
+        Series = Arrow2DSeries
+
+        # Specific for matplotlib backend
+        if Backend == MB:
+            # Create if it does not exist
+            if rendering_kw is None:
+                rendering_kw = {}
+            # Update values for length of vector to fit
+            rendering_kw.setdefault("angles", "xy")
+            rendering_kw.setdefault("scale_units", "xy")
+            rendering_kw.setdefault("scale", 1)
     else:
         Backend = kwargs.pop("backend", THREE_D_B)
-        for i in range(len(series)):
-            series[i].is_3Dvector = True
+        Series = Arrow3DSeries
+
+    series = [
+        Series(start, stop, *otherargs, label=label, normalize=normalize, **kwargs)
+        for start, stop, label in zip(point_args[0, :, :], point_args[1, :, :], labels)
+    ]
 
     _set_labels(series, labels, rendering_kw)
 
