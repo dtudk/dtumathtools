@@ -1,9 +1,22 @@
 from sympy import Matrix
 from sympy.external import import_module
 from spb.functions import plot_list, plot3d_list
+from spb.backends.base_backend import Plot
+from numpy import ndarray
 
 
 def scatter(*args, **kwargs):
+    """Create a plot with one/multiple point(s). Similar to plt.scatter.
+
+    Args:
+        points (MatrixBase, ndarray, list, float): The point(s) to scatter. If multiple points are given, simply list them as multiple arguments, each being Matrix, ndarray, or list.
+        rendering_kw (dict, optional): A dictionary forwarded to dtuplot.plot(), see SPB docs for reference.
+        color (str, optional): A string to set the color of the points with. With no argument color = 'blue'.
+        show (bool, optional): Boolean, if 'True': show plot, other just return object without plotting. Defaults to 'True'.
+
+    Returns:
+        Plot: The plot containing the points.
+    """
 
     np = import_module("numpy")
     warnings = import_module("warnings")
