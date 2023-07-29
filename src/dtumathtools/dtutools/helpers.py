@@ -2,13 +2,12 @@ from sympy import *
 from sympy import dsolve as sym_dsolve
 from functools import reduce
 from typing import Union, Optional, List
-from types import NoneType
 import warnings
 from sympy.core import Symbol, Expr
 from sympy.matrices import MatrixBase
 
 
-def _extract_vars(expr: Expr) -> List[Symbol]:
+def _extract_vars(expr: Expr) -> (List[Symbol]):
     """From a sympy expression, extract the free variables sorted by their name.
 
     Args:
@@ -20,7 +19,7 @@ def _extract_vars(expr: Expr) -> List[Symbol]:
     return [e[1] for e in sorted(list(map(lambda x: (str(x), x), expr.free_symbols)))]
 
 
-def taylor(expr: Expr, vars: List[Symbol], degree: int) -> Expr:
+def taylor(expr: Expr, vars: List[Symbol], degree: int) -> (Expr):
     """Find the taylor expansion of an expression.
 
     Args:
@@ -52,7 +51,7 @@ def taylor(expr: Expr, vars: List[Symbol], degree: int) -> Expr:
     return P_n
 
 
-def gradient(expr: Expr, var: Optional[List[Symbol]] = None) -> MatrixBase:
+def gradient(expr: Expr, var: Optional[List[Symbol]] = None) -> (MatrixBase):
     """Find the gradient of an expression.
 
     Args:
@@ -68,7 +67,7 @@ def gradient(expr: Expr, var: Optional[List[Symbol]] = None) -> MatrixBase:
     return Matrix([expr.diff(v) for v in var])
 
 
-def hessian(expr: Expr, var: Optional[Symbol] = None) -> MatrixBase:
+def hessian(expr: Expr, var: Optional[Symbol] = None) -> (MatrixBase):
     """Find the hessian of an expression.
 
     Args:
@@ -85,13 +84,13 @@ def hessian(expr: Expr, var: Optional[Symbol] = None) -> MatrixBase:
 
 
 def _extract_field_vars(
-    V: MatrixBase, var: Union[List[Symbol], NoneType], namefunc: str
-) -> List[Symbol]:
+    V: MatrixBase, var: Union[List[Symbol], None], namefunc: str
+) -> (List[Symbol]):
     """Extract variables used for field (3D) functions.
 
     Args:
         V (MatrixBase): 3D matrix representing a vector field spanning the variables.
-        var (List[Symbol], NoneType): The 3 variables which the vector field spans. Defaults to estimating them from V.
+        var (List[Symbol] | None): The 3 variables which the vector field spans. Defaults to estimating them from V.
 
     Raises:
         AssertionError: Exactly 3 variables (or None) must be specified.
@@ -126,7 +125,7 @@ def _extract_field_vars(
     return var
 
 
-def div(V: MatrixBase, var: Optional[List[Symbol]] = None) -> Expr:
+def div(V: MatrixBase, var: Optional[List[Symbol]] = None) -> (Expr):
     """Find the divergence of a vector field
 
     Args:
@@ -142,7 +141,7 @@ def div(V: MatrixBase, var: Optional[List[Symbol]] = None) -> Expr:
     return sum([V[i].diff(f) for i, f in enumerate(var)])
 
 
-def rot(V: MatrixBase, var: Optional[List[Symbol]] = None) -> MatrixBase:
+def rot(V: MatrixBase, var: Optional[List[Symbol]] = None) -> (MatrixBase):
     """Find the rotation of a vector field
 
     Args:
@@ -163,7 +162,7 @@ def rot(V: MatrixBase, var: Optional[List[Symbol]] = None) -> MatrixBase:
     )
 
 
-def dsolve(ODE: Union[Eq, list, Matrix], ics: Optional[dict] = None) -> dict:
+def dsolve(ODE: Union[Eq, list, Matrix], ics: Optional[dict] = None) -> (dict):
     """A wrapper for the sympy dsolve-function. Instead of a list of equations denoting the solution, this function returns a dictionary of solutions. This makes it easier to substitute solution in the places it's needed
 
     Args:
@@ -188,7 +187,7 @@ def dsolve(ODE: Union[Eq, list, Matrix], ics: Optional[dict] = None) -> dict:
     return {eq.lhs: eq.rhs for eq in sol}
 
 
-def l2_norm(v: MatrixBase) -> Expr:
+def l2_norm(v: MatrixBase) -> (Expr):
     """Computes the l2-norm for a Matrix-class object, without using absolute values on entries, for easier simplification and integration
 
     Args:
