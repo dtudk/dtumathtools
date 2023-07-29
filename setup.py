@@ -59,7 +59,7 @@ setup(
     package_dir={"": "src"},
     include_package_data=True,
     python_requires=">=3.8,<3.12",
-    setup_requires=["setuptools<60.0;python_version<'3.12'"],
+    # setup_requires=["setuptools<60.0;python_version<'3.12'"],
     install_requires=_minimal_deps,
     extras_require={
         "qt": _qt,
