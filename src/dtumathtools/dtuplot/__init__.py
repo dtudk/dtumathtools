@@ -5,14 +5,13 @@ from .boundaryplot import plot_boundary
 from spb.defaults import get_default_settings, cfg, set_defaults
 
 # Backends to support the vector plotting functionality.
-# Matplotlib
-from spb.backends.matplotlib.renderers.vector2d import Vector2DRenderer as MBV2
-from spb.backends.matplotlib.renderers.vector3d import Vector3DRenderer as MBV3
-# Bokeh
-from spb.backends.bokeh.renderers.vector2d import Vector2DRenderer as BBV2
-# Plotly
-from spb.backends.plotly.renderers.vector2d import Vector2DRenderer as PBV2
-from spb.backends.plotly.renderers.vector3d import Vector3DRenderer as PBV3
+from .quiverplot_helpers import (
+    MBQuiver2DRenderer as MBV2,
+    MBQuiver3DRenderer as MBV3,
+    PBQuiver2DRenderer as PBV2,
+    PBQuiver3DRenderer as PBV3,
+    BBQuiver2DRenderer as BBV2
+)
 # K3D
 from spb.backends.k3d.renderers.vector3d import Vector3DRenderer as KBV3
 # Mayavi

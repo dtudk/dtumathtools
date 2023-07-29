@@ -1,6 +1,6 @@
 from dtumathtools import *
 from sympy import *
-from spb import MB, PB
+from spb import MB, PB, BB
 import pytest
 import numpy as np
 import re
@@ -11,7 +11,7 @@ del test
 
 
 def test_quiver():
-    # galt med range...
+    # matplotlib
     dtuplot.quiver(Matrix([1, 2, 3]), Matrix([4, 5, 6]), {"color": "red"}, show=False)
     dtuplot.quiver([1, 2, 3], [4, 5, 6], show=False)
     dtuplot.quiver([1, 2], [4, 5], show=False)
@@ -27,15 +27,15 @@ def test_quiver():
     dtuplot.quiver(np.array([1, 2, 3]), Matrix([1, 2, 3]), show=False)
     dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), label="123", show=False)
     dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), label=["123"], show=False)
-
+    # plotly
     dtuplot.quiver(
-        Matrix([1, 2, 3]), Matrix([4, 5, 6]), {"color": "red"}, show=False, backend=PB
+        Matrix([1, 2, 3]), Matrix([4, 5, 6]), show=False, backend=PB
     )
     dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=PB, show=False)
     dtuplot.quiver([1, 2], [4, 5], backend=PB, show=False)
     dtuplot.quiver(Matrix([1, 2]), Matrix([4, 5]), backend=PB, show=False)
     dtuplot.quiver(
-        1, 2, 0, 0, 0, 3, rendering_kw={"color": "orange"}, backend=PB, show=False
+        1, 2, 0, 0, 0, 3, backend=PB, show=False
     )
     dtuplot.quiver(1, 2, 1, 2, backend=PB, show=False)
     dtuplot.quiver((1, 2), (1, 2), backend=PB, show=False)
@@ -47,7 +47,15 @@ def test_quiver():
     dtuplot.quiver(np.array([1, 2, 3]), Matrix([1, 2, 3]), backend=PB, show=False)
     dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), label="123", backend=PB, show=False)
     dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), label=["123"], backend=PB, show=False)
-
+    # bokeh
+    dtuplot.quiver([1, 2], [4, 5], backend=BB, show=False)
+    dtuplot.quiver(Matrix([1, 2]), Matrix([4, 5]), backend=BB, show=False)
+    dtuplot.quiver(1, 2, 1, 2, backend=BB, show=False)
+    dtuplot.quiver((1, 2), (1, 2), backend=BB, show=False)
+    dtuplot.quiver(np.array([1, 2]), (1, 2), backend=BB, show=False)
+    dtuplot.quiver(np.array([1, 2]), np.array([1, 2]), backend=BB, show=False)
+    dtuplot.quiver(np.array([1, 2]), Matrix([1, 2]), backend=BB, show=False)
+    
     with pytest.raises(
         ValueError,
         match=re.escape(

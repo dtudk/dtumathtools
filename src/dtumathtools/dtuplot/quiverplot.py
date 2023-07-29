@@ -1,10 +1,12 @@
-from spb import MB
+from spb import MB, PB, BB
 from spb.defaults import THREE_D_B, TWO_D_B
 from spb.functions import _set_labels
 from spb.series import VectorBase
 from spb.utils import _instantiate_backend
 from sympy import Matrix, latex, symbols
 from sympy.external import import_module
+from spb.backends.base_backend import Plot
+from numpy import ndarray
 
 np = import_module("numpy")
 
@@ -43,7 +45,13 @@ class ArrowSeries(VectorBase):
 
     def get_data(self):
         # This format works for both MB and PB
-        return [np.array([v]) for v in list(self.start) + list(self.direction)]
+        # Has to translate to start/end and transpose
+        # such that the x,y,z lims match the arrow
+        # compensation for this in arrow done in 
+        # quiverplot_helpers.
+        start = np.array(self.start)
+        end = start + np.array(self.direction)
+        return np.array([start, end]).T# [np.array([v]) for v in list(self.start) + list(self.direction)]
 
 
 # Specify 2D class such that this can be linked with renderer
@@ -61,8 +69,19 @@ class Arrow3DSeries(ArrowSeries):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-
 def quiver(*args, **kwargs):
+    """Create a plot with a vector.
+
+    Args:
+        start (MatrixBase, np.ndarray, list, float): The starting coordinates (2D or 3D) of the vector. Can be given in multitude of ways/inputs.
+        direction (MatrixBase, ndarray, list, float): The direction (2D or 3D) of the vector. Can be given in multitude of ways/inputs.
+        rendering_kw (dict, optional): A dictionary forwarded to dtuplot.plot(), see SPB docs for reference.
+        color (str, optional): A string to set the color of the vector with. With no argument color = 'blue'.
+        show (bool, optional): Boolean, if 'True': show plot, other just return object without plotting. Defaults to 'True'.
+
+    Returns:
+        Plot: The vector plot.
+    """
     # format if numbers are entered directly instead of lists
     num_single = 0
     args = list(args)
@@ -162,12 +181,29 @@ def quiver(*args, **kwargs):
             rendering_kw.setdefault("angles", "xy")
             rendering_kw.setdefault("scale_units", "xy")
             rendering_kw.setdefault("scale", 1)
+        elif Backend == PB:
+            if rendering_kw is None:
+                rendering_kw = {}
+            rendering_kw.setdefault("scale", 1)
+            rendering_kw.setdefault("scaleratio", 1)
+        elif Backend == BB:
+            if rendering_kw is None:
+                rendering_kw = {}
+            mag = np.linalg.norm(point_args[-1].flatten(),2)
+            rendering_kw.setdefault("scale", mag)
+            rendering_kw.setdefault("pivot", "tail")
     else:
         Backend = kwargs.pop("backend", THREE_D_B)
         Series = Arrow3DSeries
+        
+        if Backend == PB:
+            if rendering_kw is None:
+                rendering_kw = {}
+            rendering_kw.setdefault("sizeref", 1)
+            rendering_kw.setdefault("sizemode", "scaled")
 
     series = [
-        Series(start, stop, *otherargs, label=label, normalize=normalize, **kwargs)
+        Series(start, stop,*otherargs, label=label, normalize=normalize, **kwargs)
         for start, stop, label in zip(point_args[0, :, :], point_args[1, :, :], labels)
     ]
 
