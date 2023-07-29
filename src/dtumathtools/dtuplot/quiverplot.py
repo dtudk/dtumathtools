@@ -86,8 +86,7 @@ def quiver(*args, **kwargs):
         else:
             args = [[args[0], args[1], args[2]], [args[3], args[4], args[5]]]
     elif num_single != 0:
-        raise f"Error! Wrong format used in quiver. Got {num_single} arguments \
-            that could be start or direction vector coordinates!"
+        raise ValueError(f"Error! Wrong format used in quiver. Got {num_single} arguments that could be start or direction vector coordinates!")
 
     # split arguments into vectors and other arguments
     point_args = []
@@ -112,8 +111,7 @@ def quiver(*args, **kwargs):
         ], "Error! Start and direction vectors must be 2D or 3D!"
         args = otherargs
     except:
-        raise f"Error! Wrong format used in quiver. \
-        Got {point_args[0]} as starting point(s) and {point_args[1]} as ending point(s)!"
+        raise ValueError(f"Error! Wrong format used in quiver. Got {point_args[0]} as starting point(s) and {point_args[1]} as ending point(s)!")
 
     # want structure to be [list of starts, list of ends]
     # where list of starts could be [start1, start2, ...], either 2D or 3D points
