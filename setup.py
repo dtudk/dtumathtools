@@ -35,7 +35,7 @@ _dev_deps = _extra_deps + [
 
 setup(
     name="dtumathtools",
-    version="2.0.0",
+    version="1.1.0",
     author="Christian Mikkelstrup and Hans Henrik Hermansen",
     author_email="s194345@student.dtu.dk, s194042@student.dtu.dk",
     maintainer="Christian Mikkelstrup",
