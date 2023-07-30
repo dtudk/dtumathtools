@@ -1,4 +1,4 @@
-from sympy import Matrix
+from sympy import Matrix, Expr
 from sympy.external import import_module
 from spb.functions import plot_list, plot3d_list
 from spb.backends.base_backend import Plot
@@ -11,7 +11,7 @@ def scatter(*args, **kwargs):
     """Create a plot with one/multiple point(s). Similar to plt.scatter.
 
     Args:
-        points (MatrixBase, np.ndarray, list, float): The point(s) to scatter. If multiple points are given, simply list them as multiple arguments, each being Matrix, np.ndarray, or list.
+        points (MatrixBase, np.ndarray, list, float): The point(s) to scatter. Format is 'x, y, [z], **kwargs' with x,y,[z] being Matrix, list, float or np.ndarray. If a single Matrix, list or np.ndarray is given, each entry will be treated as seperate a point.
         rendering_kw (dict, optional): A dictionary forwarded to dtuplot.plot(), see SPB docs for reference.
         color (str, optional): A string to set the color of the points with. With no argument color = 'blue'.
         show (bool, optional): Boolean, if 'True': show plot, other just return object without plotting. Defaults to 'True'.
@@ -31,50 +31,59 @@ def scatter(*args, **kwargs):
     # format all arguments
     dim = 0
     args = list(args)
-    otherargs = []
-    matrixlist = []
-    for i in range(len(args)):
-        if type(args[i]) in (list, tuple):
-            args[i] = np.array(args[i])
-            dim += 1
-        elif type(args[i]) == np.ndarray:
-            if len(args[i].shape) > 1:
-                warnings.warn(
-                    f"np.array with more than 1 dimension ({len(args[i].shape)} dimensions was found) has been flattened!"
-                )
-            args[i] = args[i].flatten()
-            dim += 1
-        elif type(args[i]) in [float, int]:
-            args[i] = np.array([args[i]])
-            dim += 1
-        elif type(args[i]) == type(Matrix()):
-            matrixlist.append(args[i])
-        else:
-            try:
-                # symbolic expression not multiplied fully
-                args[i] = np.array([float(args[i])])
+    if len(args) == 1 and type(args[0]) in [list, tuple, type(Matrix()), np.ndarray]:
+        # Single list/tuple/matrix/array given, assume this is list of (single) point(s)
+        coords = [[],[],[]]
+        dim = None
+        for i, arg in enumerate(args[0]):
+            if type(arg) in [float, int, Expr]:
+                # the single arg is a single point
+                dim = len(args[0])
+                coords[i].append(float(arg))
+            elif type(arg) in [list, tuple, type(Matrix()), np.ndarray]:
+                # Unify format
+                arg = np.array(arg).flatten()
+                # Check dimension
+                if dim is None:
+                    dim = len(arg)
+                else:
+                    assert len(arg) == dim, "Length of all points in list must match!"
+                # Sort the coordinates into correct bins
+                for o, coord in enumerate(arg):
+                    assert type(coord) in [float, int, Expr], f"Invalid type of coordinate, recieved {coord} with type {type(coord)}"
+                    coords[o].append(float(coord))
+            assert dim in [2,3], "Points given (single or list of) must be 2D or 3D!"
+        
+        if len(coords[-1]) == 0:
+            assert dim == 2, "Unspecified error!"
+            del coords[-1]
+        
+        args = coords
+    else:
+        # Probably a list of arguments given!
+        for i in range(len(args)):
+            if type(args[i]) in (list, tuple, type(Matrix())):
+                # This is x, y, or z argument. List of these coordinates for each point.
+                args[i] = np.array(args[i]).flatten()
                 dim += 1
-            except:
-                otherargs.append(args[i])
-
-    # if entries are matricies, get them into right format
-    if len(matrixlist) > 0:
-        assert dim == 0, "Cannot mix matrix and non-matrix arguments!"
-        firstshape = matrixlist[0].shape
-        assert len(firstshape) in [1, 2], "Matrix must be 1D or 2D!"
-        assert (
-            min(firstshape) == 1
-        ), "Matrix must not have multiple dimensions different from size 1!"
-        dim = max(firstshape)
-        newargs = [np.array([])] * dim
-        for i in range(len(matrixlist)):
-            assert (
-                matrixlist[i].shape == firstshape
-            ), "All matrices must have the same shape!"
-            for j in range(len(matrixlist[i])):
-                newargs[j] = np.append(newargs[j], matrixlist[i][j])
-        args = newargs
-        args.extend(otherargs)
+            elif type(args[i]) == np.ndarray:
+                if len(args[i].shape) > 1:
+                    warnings.warn(
+                        f"np.array with more than 1 dimension ({len(args[i].shape)} dimensions was found) has been flattened!"
+                    )
+                args[i] = args[i].flatten()
+                dim += 1
+            elif type(args[i]) in [float, int]:
+                # Single entries for x,y,z given.
+                args[i] = np.array([args[i]])
+                dim += 1
+            else:
+                try:
+                    # symbolic expression not multiplied fully
+                    args[i] = np.array([float(args[i])])
+                    dim += 1
+                except:
+                    raise ValueError(f"Unknown input found: {args[i]}")
 
     assert dim in [2, 3], "scatterplot only supports 2D and 3D plots"
     if dim == 2:
