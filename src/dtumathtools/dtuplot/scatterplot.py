@@ -2,14 +2,16 @@ from sympy import Matrix
 from sympy.external import import_module
 from spb.functions import plot_list, plot3d_list
 from spb.backends.base_backend import Plot
-from numpy import ndarray
+import numpy as np
+from spb import MB, PB, BB, KB, MAB
+from spb.defaults import THREE_D_B, TWO_D_B
 
 
 def scatter(*args, **kwargs):
     """Create a plot with one/multiple point(s). Similar to plt.scatter.
 
     Args:
-        points (MatrixBase, ndarray, list, float): The point(s) to scatter. If multiple points are given, simply list them as multiple arguments, each being Matrix, ndarray, or list.
+        points (MatrixBase, np.ndarray, list, float): The point(s) to scatter. If multiple points are given, simply list them as multiple arguments, each being Matrix, np.ndarray, or list.
         rendering_kw (dict, optional): A dictionary forwarded to dtuplot.plot(), see SPB docs for reference.
         color (str, optional): A string to set the color of the points with. With no argument color = 'blue'.
         show (bool, optional): Boolean, if 'True': show plot, other just return object without plotting. Defaults to 'True'.
@@ -76,10 +78,31 @@ def scatter(*args, **kwargs):
 
     assert dim in [2, 3], "scatterplot only supports 2D and 3D plots"
     if dim == 2:
+        Backend = kwargs.pop("backend", TWO_D_B)
+        if Backend == KB:
+            raise NotImplementedError("K3D does not support 2D scatter plots!")
+        elif Backend == MAB:
+            raise NotImplementedError("Mayavi does not support 2D scatter plots!")
         rendering_kw = kwargs.pop("rendering_kw", {})
         markersize = rendering_kw.pop("s", None)
         if markersize is not None:
             rendering_kw.setdefault("markersize", markersize)
-        return plot_list(*args, is_point=True, rendering_kw=rendering_kw, **kwargs)
+        return plot_list(*args, is_point=True, rendering_kw=rendering_kw, backend=Backend, **kwargs)
     else:
-        return plot3d_list(*args, is_point=True, **kwargs)
+        Backend = kwargs.pop("backend", THREE_D_B)
+        if Backend == BB:
+            raise NotImplementedError("Bokeh does not support 3D scatter plots!")
+        return plot3d_list(*args, is_point=True, backend=Backend, **kwargs)
+
+# Adjust renderer for Mayavi to support 3D scatter plotting
+from spb.backends.mayavi.renderers.line3d import _draw_line3d_helper, _update_line3d_helper
+from spb.backends.base_renderer import Renderer
+def MAB_draw_line3d_helper(renderer, data):
+    x, y, z = data
+    u = np.ones_like(x)
+    return _draw_line3d_helper(renderer, (x,y,z,u))
+
+class Point3DRenderer(Renderer):
+    draw_update_map = {
+        MAB_draw_line3d_helper: _update_line3d_helper
+    }
