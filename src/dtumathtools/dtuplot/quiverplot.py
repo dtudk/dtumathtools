@@ -1,4 +1,4 @@
-from spb import MB, PB, BB
+from spb import MB, PB, BB, KB, MAB
 from spb.defaults import THREE_D_B, TWO_D_B
 from spb.functions import _set_labels
 from spb.series import VectorBase
@@ -6,7 +6,7 @@ from spb.utils import _instantiate_backend
 from sympy import Matrix, latex, symbols
 from sympy.external import import_module
 from spb.backends.base_backend import Plot
-from numpy import ndarray
+import warnings
 
 np = import_module("numpy")
 
@@ -35,6 +35,8 @@ class ArrowSeries(VectorBase):
         self.use_cm = kwargs.get("use_cm", False)
         # Linked colormap using vector2d renderer
         self.use_quiver_solid_color = not self.use_cm
+        # Line color needed for Mayavi
+        self._line_color = kwargs.get("line_color", None)
 
     def __str__(self):
         # Overwrite the VectorBase __str__ as it assumes things
@@ -74,7 +76,7 @@ def quiver(*args, **kwargs):
 
     Args:
         start (MatrixBase, np.ndarray, list, float): The starting coordinates (2D or 3D) of the vector. Can be given in multitude of ways/inputs.
-        direction (MatrixBase, ndarray, list, float): The direction (2D or 3D) of the vector. Can be given in multitude of ways/inputs.
+        direction (MatrixBase, np.ndarray, list, float): The direction (2D or 3D) of the vector. Can be given in multitude of ways/inputs.
         rendering_kw (dict, optional): A dictionary forwarded to dtuplot.plot(), see SPB docs for reference.
         color (str, optional): A string to set the color of the vector with. With no argument color = 'blue'.
         show (bool, optional): Boolean, if 'True': show plot, other just return object without plotting. Defaults to 'True'.
@@ -162,7 +164,8 @@ def quiver(*args, **kwargs):
 
     # rendering_kw needs to be passed to the plotting backend, but not
     # to the series. Thus pulled out here.
-    rendering_kw = kwargs.pop("rendering_kw", None)
+    # Create if it does not exist
+    rendering_kw = kwargs.pop("rendering_kw", {})
     # normalize argument needs to be passed to series object, but not to
     # backend. Otherwise warning will be raised. Thus pulled out here.
     normalize = kwargs.pop("normalize", False)
@@ -174,33 +177,41 @@ def quiver(*args, **kwargs):
 
         # Specific for matplotlib backend
         if Backend == MB:
-            # Create if it does not exist
-            if rendering_kw is None:
-                rendering_kw = {}
             # Update values for length of vector to fit
             rendering_kw.setdefault("angles", "xy")
             rendering_kw.setdefault("scale_units", "xy")
             rendering_kw.setdefault("scale", 1)
         elif Backend == PB:
-            if rendering_kw is None:
-                rendering_kw = {}
             rendering_kw.setdefault("scale", 1)
             rendering_kw.setdefault("scaleratio", 1)
         elif Backend == BB:
-            if rendering_kw is None:
-                rendering_kw = {}
             mag = np.linalg.norm(point_args[-1].flatten(),2)
             rendering_kw.setdefault("scale", mag)
             rendering_kw.setdefault("pivot", "tail")
+        elif Backend == KB:
+            raise NotImplementedError("K3D backend does not support 2D vector plots!")
+        elif Backend == MAB:
+            raise NotImplementedError("Mayavi backend does not support 2D vector plots!")
     else:
         Backend = kwargs.pop("backend", THREE_D_B)
         Series = Arrow3DSeries
         
         if Backend == PB:
-            if rendering_kw is None:
-                rendering_kw = {}
             rendering_kw.setdefault("sizeref", 1)
             rendering_kw.setdefault("sizemode", "scaled")
+            rendering_kw.setdefault("anchor", "tail") #point_args[0,0]
+        elif Backend == BB:
+            raise NotImplementedError("Bokeh backend does not support 3D vector plots!")
+        elif Backend == KB:
+            rendering_kw.setdefault("pivot", "tail")
+        elif Backend == MAB:
+            rendering_kw.setdefault("scale_factor", 1)
+            rendering_kw.setdefault("resolution", 100)
+            display_warning = kwargs.pop("warning", True)
+            if display_warning:
+                warnings.warn(
+                    f"Because of the Mayavi backend, the origin of the vector might be slightly off. To supress this warning, set 'warning=False'"
+                )
 
     series = [
         Series(start, stop,*otherargs, label=label, normalize=normalize, **kwargs)

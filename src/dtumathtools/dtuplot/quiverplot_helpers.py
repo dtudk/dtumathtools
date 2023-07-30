@@ -123,3 +123,53 @@ class BBQuiver2DRenderer(Renderer):
     draw_update_map = {
         BB_draw_quiver2d_helper: BB_update_quiver2d_helper
     }
+
+# K3D
+from spb.backends.k3d.renderers.vector3d import (
+    _draw_vector3d_helper as KB_draw_vector3d_helper, 
+    _update_vector3d_helper as KB_update_vector3d_helper,
+)
+
+def KB_draw_quiver3d_helper(renderer, data):
+    start, end = data.T
+    direction = end-start
+    xx,yy,zz = start
+    uu,vv,ww = direction
+    return KB_draw_vector3d_helper(renderer, (xx,yy,zz,uu,vv,ww))
+
+def KB_update_quiver3d_helper(renderer, data, handle):
+    start, end = data.T
+    direction = end-start
+    xx,yy,zz = start
+    uu,vv,ww = direction
+    return KB_update_vector3d_helper(renderer, (xx,yy,zz,uu,vv,ww), handle)
+
+class KBQuiver3DRenderer(Renderer):
+    draw_update_map = {
+        KB_draw_quiver3d_helper: KB_update_quiver3d_helper
+    }
+
+# Mayavi
+from spb.backends.mayavi.renderers.vector3d import (
+    _draw_vector3d_helper as MAB_draw_vector3d_helper, 
+    _update_vector3d_helper as MAB_update_vector3d_helper,
+)
+
+def MAB_draw_quiver3d_helper(renderer, data):
+    start, end = data.T
+    direction = end-start
+    xx,yy,zz = start
+    uu,vv,ww = direction
+    return MAB_draw_vector3d_helper(renderer, (xx,yy,zz,uu,vv,ww))
+
+def MAB_update_quiver3d_helper(renderer, data, handle):
+    start, end = data.T
+    direction = end-start
+    xx,yy,zz = start
+    uu,vv,ww = direction
+    return MAB_update_vector3d_helper(renderer, (xx,yy,zz,uu,vv,ww), handle)
+
+class MABQuiver3DRenderer(Renderer):
+    draw_update_map = {
+        MAB_draw_quiver3d_helper: MAB_update_quiver3d_helper
+    }
