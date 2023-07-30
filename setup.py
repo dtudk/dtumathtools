@@ -15,7 +15,7 @@ _bokeh = ["panel>=1.0.0", "ipywidgets_bokeh"]
 _k3d = ["vtk","k3d>=2.9.7"]
 # updated due to https://github.com/enthought/mayavi/issues/1232#issuecomment-1537507823
 # Should be version >=4.8.2, but does not exist yet...
-_myavi = _qt+["vtk", "mayavi @ git+https://git@github.com/enthought/mayavi"]
+_myavi = _qt+["vtk", "ipyevents", "mayavi @ git+https://git@github.com/enthought/mayavi"]
 # # A creative possible fix for when 4.8.2 comes out?
 # import requests   # requires requests as 'setup_requires'
 # if requests.get("https://pypi.org/project/mayavi/4.8.2/").status_code == 200:

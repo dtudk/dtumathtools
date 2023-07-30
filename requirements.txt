@@ -9,6 +9,7 @@ numpy>=1.24
 # plotly>=4.14.3
 # ipympl>=0.7.0
 # mayavi>=4.8.0
+# ipyevents
 # panel>=1.0.0
 # ipywidgets_bokeh
 # k3d>=2.9.7
