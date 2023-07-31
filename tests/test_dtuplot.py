@@ -4,6 +4,7 @@ from spb import MB, PB, BB, KB, MAB
 import pytest
 import numpy as np
 import re
+from mayavi import mlab # used for the mayavi test to disable popups
 
 # remove sympy variable named "test"
 test = 0
@@ -74,7 +75,6 @@ def test_quiver():
         DeprecationWarning
     ):
         # Options to hide screen popping up
-        from mayavi import mlab
         mlab.options.offscreen = True
         dtuplot.quiver(Matrix([1, 2, 3]), Matrix([4, 5, 6]), backend=MAB, show=False, warning=False)
         dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=MAB, show=False, warning=False)
@@ -279,6 +279,9 @@ def test_scatterplot():
     dtuplot.scatter([1,2],backend=MB, show=False)
     dtuplot.scatter((1,2),backend=MB, show=False)
     dtuplot.scatter(Matrix([1,2]),backend=MB, show=False)
+    dtuplot.scatter([pi,2*pi],backend=MB, show=False)
+    dtuplot.scatter(np.array([pi,2*pi]),backend=MB, show=False)
+    dtuplot.scatter(Matrix([pi,2*pi]),backend=MB, show=False)
     dtuplot.scatter(Matrix([-1,0,1]),backend=MB, show=False)
     dtuplot.scatter(Matrix([0,0,0]),backend=MB, show=False)
     dtuplot.scatter(np.array([1,2]),backend=MB, show=False)
