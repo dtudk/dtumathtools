@@ -4,7 +4,6 @@ from spb import MB, PB, BB, KB, MAB
 import pytest
 import numpy as np
 import re
-from mayavi import mlab  # used for the mayavi test to disable popups
 
 # remove sympy variable named "test"
 test = 0
@@ -75,8 +74,9 @@ def test_quiver():
     # mayavi
     # A lot of things in the Mayavi toolbox is deprecated...
     with pytest.warns(DeprecationWarning):
-        # Options to hide screen popping up
-        mlab.options.offscreen = True
+        # # Options to hide screen popping up (commented out for github actions testing)
+        # from mayavi import mlab  # used for the mayavi test to disable popups
+        # mlab.options.offscreen = True
         dtuplot.quiver(
             Matrix([1, 2, 3]), Matrix([4, 5, 6]), backend=MAB, show=False, warning=False
         )
