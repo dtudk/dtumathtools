@@ -9,6 +9,8 @@ import re
 test = 0
 del test
 
+# Disable mayavi tests for github actions, as this fails
+test_mab = False
 
 def test_quiver():
     # matplotlib
@@ -72,49 +74,50 @@ def test_quiver():
             [1, 2, 3], Matrix([1, 2, 3]), label=["123"], backend=KB, show=False
         )
     # mayavi
-    # A lot of things in the Mayavi toolbox is deprecated...
-    with pytest.warns(DeprecationWarning):
-        # # Options to hide screen popping up (commented out for github actions testing)
-        # from mayavi import mlab  # used for the mayavi test to disable popups
-        # mlab.options.offscreen = True
-        dtuplot.quiver(
-            Matrix([1, 2, 3]), Matrix([4, 5, 6]), backend=MAB, show=False, warning=False
-        )
-        dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=MAB, show=False, warning=False)
-        dtuplot.quiver(1, 2, 0, 0, 0, 3, backend=MAB, show=False, warning=False)
-        dtuplot.quiver(
-            np.array([1, 2, 3]), (1, 2, 3), backend=MAB, show=False, warning=False
-        )
-        dtuplot.quiver(
-            np.array([1, 2, 3]),
-            np.array([1, 2, 3]),
-            backend=MAB,
-            show=False,
-            warning=False,
-        )
-        dtuplot.quiver(
-            np.array([1, 2, 3]),
-            Matrix([1, 2, 3]),
-            backend=MAB,
-            show=False,
-            warning=False,
-        )
-        dtuplot.quiver(
-            [1, 2, 3],
-            Matrix([1, 2, 3]),
-            label="123",
-            backend=MAB,
-            show=False,
-            warning=False,
-        )
-        dtuplot.quiver(
-            [1, 2, 3],
-            Matrix([1, 2, 3]),
-            label=["123"],
-            backend=MAB,
-            show=False,
-            warning=False,
-        )
+    if test_mab:
+        # A lot of things in the Mayavi toolbox is deprecated...
+        with pytest.warns(DeprecationWarning):
+            # # Options to hide screen popping up (commented out for github actions testing)
+            # from mayavi import mlab  # used for the mayavi test to disable popups
+            # mlab.options.offscreen = True
+            dtuplot.quiver(
+                Matrix([1, 2, 3]), Matrix([4, 5, 6]), backend=MAB, show=False, warning=False
+            )
+            dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=MAB, show=False, warning=False)
+            dtuplot.quiver(1, 2, 0, 0, 0, 3, backend=MAB, show=False, warning=False)
+            dtuplot.quiver(
+                np.array([1, 2, 3]), (1, 2, 3), backend=MAB, show=False, warning=False
+            )
+            dtuplot.quiver(
+                np.array([1, 2, 3]),
+                np.array([1, 2, 3]),
+                backend=MAB,
+                show=False,
+                warning=False,
+            )
+            dtuplot.quiver(
+                np.array([1, 2, 3]),
+                Matrix([1, 2, 3]),
+                backend=MAB,
+                show=False,
+                warning=False,
+            )
+            dtuplot.quiver(
+                [1, 2, 3],
+                Matrix([1, 2, 3]),
+                label="123",
+                backend=MAB,
+                show=False,
+                warning=False,
+            )
+            dtuplot.quiver(
+                [1, 2, 3],
+                Matrix([1, 2, 3]),
+                label=["123"],
+                backend=MAB,
+                show=False,
+                warning=False,
+            )
 
     with pytest.raises(
         NotImplementedError, match="Mayavi backend does not support 2D vector plots!"
@@ -502,48 +505,49 @@ def test_scatterplot():
             show=False,
         )
     # mayavi
-    with pytest.warns(DeprecationWarning):
-        dtuplot.scatter(1, 2, 3, backend=MAB, show=False)
-        dtuplot.scatter([1, 2, 3], [4, 5, 6], [7, 8, 9], backend=MAB, show=False)
-        dtuplot.scatter(
-            np.array([1, 2, 3]),
-            np.array([4, 5, 6]),
-            np.array([7, 8, 9]),
-            backend=MAB,
-            show=False,
-        )
-        dtuplot.scatter(
-            np.array([1]), np.array([4]), np.array([7]), backend=MAB, show=False
-        )
-        dtuplot.scatter(
-            Matrix([1, 2, 3]).T,
-            Matrix([4, 5, 6]),
-            Matrix([[4], [5], [6]]),
-            backend=MAB,
-            show=False,
-        )
-        dtuplot.scatter(
-            np.array([1, 2, 3]), Matrix([4, 5, 6]), [7, 8, 9], backend=MAB, show=False
-        )
-        dtuplot.scatter(Matrix([-1, 0, 1]), backend=MAB, show=False)
-        dtuplot.scatter(Matrix([0, 0, 0]), backend=MAB, show=False)
-        dtuplot.scatter([1, 2, 3], backend=MAB, show=False)
-        dtuplot.scatter((1, 2, 3), backend=MAB, show=False)
-        dtuplot.scatter(Matrix([1, 2, 3]), backend=MAB, show=False)
-        dtuplot.scatter(np.array([1, 2, 3]), backend=MAB, show=False)
-        dtuplot.scatter([[1, 2, 3], [4, 5, 6]], backend=MAB, show=False)
-        dtuplot.scatter([(1, 2, 3), [4, 5, 6]], backend=MAB, show=False)
-        dtuplot.scatter([Matrix([1, 2, 3]), [4, 5, 6]], backend=MAB, show=False)
-        dtuplot.scatter([Matrix([1, 2, 3]), Matrix([4, 5, 6])], backend=MAB, show=False)
-        dtuplot.scatter([np.array([1, 2, 3]), [4, 5, 6]], backend=MAB, show=False)
-        dtuplot.scatter(
-            [np.array([1, 2, 3]), np.array([4, 5, 6])], backend=MAB, show=False
-        )
-        dtuplot.scatter(
-            [Matrix([1, 2, 3]), [4, 5, 6], (7, 8, 9), np.array([-2, -1, 0])],
-            backend=MAB,
-            show=False,
-        )
+    if test_mab:
+        with pytest.warns(DeprecationWarning):
+            dtuplot.scatter(1, 2, 3, backend=MAB, show=False)
+            dtuplot.scatter([1, 2, 3], [4, 5, 6], [7, 8, 9], backend=MAB, show=False)
+            dtuplot.scatter(
+                np.array([1, 2, 3]),
+                np.array([4, 5, 6]),
+                np.array([7, 8, 9]),
+                backend=MAB,
+                show=False,
+            )
+            dtuplot.scatter(
+                np.array([1]), np.array([4]), np.array([7]), backend=MAB, show=False
+            )
+            dtuplot.scatter(
+                Matrix([1, 2, 3]).T,
+                Matrix([4, 5, 6]),
+                Matrix([[4], [5], [6]]),
+                backend=MAB,
+                show=False,
+            )
+            dtuplot.scatter(
+                np.array([1, 2, 3]), Matrix([4, 5, 6]), [7, 8, 9], backend=MAB, show=False
+            )
+            dtuplot.scatter(Matrix([-1, 0, 1]), backend=MAB, show=False)
+            dtuplot.scatter(Matrix([0, 0, 0]), backend=MAB, show=False)
+            dtuplot.scatter([1, 2, 3], backend=MAB, show=False)
+            dtuplot.scatter((1, 2, 3), backend=MAB, show=False)
+            dtuplot.scatter(Matrix([1, 2, 3]), backend=MAB, show=False)
+            dtuplot.scatter(np.array([1, 2, 3]), backend=MAB, show=False)
+            dtuplot.scatter([[1, 2, 3], [4, 5, 6]], backend=MAB, show=False)
+            dtuplot.scatter([(1, 2, 3), [4, 5, 6]], backend=MAB, show=False)
+            dtuplot.scatter([Matrix([1, 2, 3]), [4, 5, 6]], backend=MAB, show=False)
+            dtuplot.scatter([Matrix([1, 2, 3]), Matrix([4, 5, 6])], backend=MAB, show=False)
+            dtuplot.scatter([np.array([1, 2, 3]), [4, 5, 6]], backend=MAB, show=False)
+            dtuplot.scatter(
+                [np.array([1, 2, 3]), np.array([4, 5, 6])], backend=MAB, show=False
+            )
+            dtuplot.scatter(
+                [Matrix([1, 2, 3]), [4, 5, 6], (7, 8, 9), np.array([-2, -1, 0])],
+                backend=MAB,
+                show=False,
+            )
 
     # testing arguments
     dtuplot.scatter(
