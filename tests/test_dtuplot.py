@@ -270,8 +270,37 @@ def test_scatterplot():
     dtuplot.scatter(np.array([1]), np.array([4]), backend=MB, show=False)
     dtuplot.scatter(
         Matrix([1, 2, 3]), Matrix([4, 5, 6]), backend=MB, show=False
-    )  # different behavior to the np.array version
+    )
     dtuplot.scatter(Matrix([1, 2]), Matrix([4, 5]), backend=MB, show=False)
+    
+    dtuplot.scatter(Matrix([1, 2]).T, Matrix([4, 5]), backend=MB, show=False)
+    dtuplot.scatter(np.array([1, 2]), Matrix([4, 5]), backend=MB, show=False)
+    dtuplot.scatter(np.array([1, 2]), Matrix([4, 5]), [7,8], backend=MB, show=False)
+    dtuplot.scatter([1,2],backend=MB, show=False)
+    dtuplot.scatter((1,2),backend=MB, show=False)
+    dtuplot.scatter(Matrix([1,2]),backend=MB, show=False)
+    dtuplot.scatter(Matrix([-1,0,1]),backend=MB, show=False)
+    dtuplot.scatter(Matrix([0,0,0]),backend=MB, show=False)
+    dtuplot.scatter(np.array([1,2]),backend=MB, show=False)
+    dtuplot.scatter([1,2,3],backend=MB, show=False)
+    dtuplot.scatter((1,2,3),backend=MB, show=False)
+    dtuplot.scatter(Matrix([1,2,3]),backend=MB, show=False)
+    dtuplot.scatter(np.array([1,2,3]),backend=MB, show=False)
+    dtuplot.scatter([[1,2],[4,5]],backend=MB, show=False)
+    dtuplot.scatter([(1,2),[4,5]],backend=MB, show=False)
+    dtuplot.scatter([Matrix([1,2]),[4,5]],backend=MB, show=False)
+    dtuplot.scatter([Matrix([1,2]),Matrix([4,5])],backend=MB, show=False)
+    dtuplot.scatter([np.array([1,2]),[4,5]],backend=MB, show=False)
+    dtuplot.scatter([np.array([1,2]),np.array([4,5])],backend=MB, show=False)
+    dtuplot.scatter([Matrix([1,2]),np.array([4,5]),(7,8), [3,9]],backend=MB, show=False)
+    dtuplot.scatter([[1,2,3],[4,5,6]],backend=MB, show=False)
+    dtuplot.scatter([(1,2,3),[4,5,6]],backend=MB, show=False)
+    dtuplot.scatter([Matrix([1,2,3]),[4,5,6]],backend=MB, show=False)
+    dtuplot.scatter([Matrix([1,2,3]),Matrix([4,5,6])],backend=MB, show=False)
+    dtuplot.scatter([np.array([1,2,3]),[4,5,6]],backend=MB, show=False)
+    dtuplot.scatter([np.array([1,2,3]),np.array([4,5,6])],backend=MB, show=False)
+    dtuplot.scatter([Matrix([1,2,3]),[4,5,6],(7,8,9), np.array([-2,-1,0])],backend=MB, show=False)
+    
     with pytest.raises(
         AssertionError, match="scatterplot only supports 2D and 3D plots"
     ):
@@ -313,6 +342,33 @@ def test_scatterplot():
         AssertionError, match="scatterplot only supports 2D and 3D plots"
     ):
         dtuplot.scatter(1, backend=PB, show=False)
+    dtuplot.scatter(Matrix([1, 2]).T, Matrix([4, 5]), backend=PB, show=False)
+    dtuplot.scatter(np.array([1, 2]), Matrix([4, 5]), backend=PB, show=False)
+    dtuplot.scatter(np.array([1, 2]), Matrix([4, 5]), [7,8], backend=PB, show=False)
+    dtuplot.scatter([1,2],backend=PB, show=False)
+    dtuplot.scatter((1,2),backend=PB, show=False)
+    dtuplot.scatter(Matrix([1,2]),backend=PB, show=False)
+    dtuplot.scatter(Matrix([-1,0,1]),backend=PB, show=False)
+    dtuplot.scatter(Matrix([0,0,0]),backend=PB, show=False)
+    dtuplot.scatter(np.array([1,2]),backend=PB, show=False)
+    dtuplot.scatter([1,2,3],backend=PB, show=False)
+    dtuplot.scatter((1,2,3),backend=PB, show=False)
+    dtuplot.scatter(Matrix([1,2,3]),backend=PB, show=False)
+    dtuplot.scatter(np.array([1,2,3]),backend=PB, show=False)
+    dtuplot.scatter([[1,2],[4,5]],backend=PB, show=False)
+    dtuplot.scatter([(1,2),[4,5]],backend=PB, show=False)
+    dtuplot.scatter([Matrix([1,2]),[4,5]],backend=PB, show=False)
+    dtuplot.scatter([Matrix([1,2]),Matrix([4,5])],backend=PB, show=False)
+    dtuplot.scatter([np.array([1,2]),[4,5]],backend=PB, show=False)
+    dtuplot.scatter([np.array([1,2]),np.array([4,5])],backend=PB, show=False)
+    dtuplot.scatter([Matrix([1,2]),np.array([4,5]),(7,8), [3,9]],backend=PB, show=False)
+    dtuplot.scatter([[1,2,3],[4,5,6]],backend=PB, show=False)
+    dtuplot.scatter([(1,2,3),[4,5,6]],backend=PB, show=False)
+    dtuplot.scatter([Matrix([1,2,3]),[4,5,6]],backend=PB, show=False)
+    dtuplot.scatter([Matrix([1,2,3]),Matrix([4,5,6])],backend=PB, show=False)
+    dtuplot.scatter([np.array([1,2,3]),[4,5,6]],backend=PB, show=False)
+    dtuplot.scatter([np.array([1,2,3]),np.array([4,5,6])],backend=PB, show=False)
+    dtuplot.scatter([Matrix([1,2,3]),[4,5,6],(7,8,9), np.array([-2,-1,0])],backend=PB, show=False)
     # bokeh
     dtuplot.scatter(1, 2, backend=BB, show=False)
     dtuplot.scatter([1], [2], backend=BB, show=False)
@@ -320,10 +376,23 @@ def test_scatterplot():
     dtuplot.scatter([1, 2, 3], [4, 5, 6], backend=BB, show=False)
     dtuplot.scatter(np.array([1, 2, 3]), np.array([4, 5, 6]), backend=BB, show=False)
     dtuplot.scatter(np.array([1]), np.array([4]), backend=BB, show=False)
-    # dtuplot.scatter(
-    #     Matrix([1, 2, 3]), Matrix([4, 5, 6]), backend=BB, show=False
-    # ) 
     dtuplot.scatter(Matrix([1, 2]), Matrix([4, 5]), backend=BB, show=False)
+    dtuplot.scatter(Matrix([1, 2]).T, Matrix([4, 5]), backend=BB, show=False)
+    dtuplot.scatter(np.array([1, 2]), Matrix([4, 5]), backend=BB, show=False)
+    dtuplot.scatter(np.array([1, 2]), [7,8], backend=BB, show=False)
+    dtuplot.scatter([1,2],backend=BB, show=False)
+    dtuplot.scatter((1,2),backend=BB, show=False)
+    dtuplot.scatter(Matrix([1,2]),backend=BB, show=False)
+    dtuplot.scatter(Matrix([1.,2.]),backend=BB, show=False)
+    dtuplot.scatter(Matrix([-1,0]),backend=BB, show=False)
+    dtuplot.scatter(np.array([1,2]),backend=BB, show=False)
+    dtuplot.scatter([[1,2],[4,5]],backend=BB, show=False)
+    dtuplot.scatter([(1,2),[4,5]],backend=BB, show=False)
+    dtuplot.scatter([Matrix([1,2]),[4,5]],backend=BB, show=False)
+    dtuplot.scatter([Matrix([1,2]),Matrix([4,5])],backend=BB, show=False)
+    dtuplot.scatter([np.array([1,2]),[4,5]],backend=BB, show=False)
+    dtuplot.scatter([np.array([1,2]),np.array([4,5])],backend=BB, show=False)
+    dtuplot.scatter([Matrix([1,2]),np.array([4,5]),(7,8), [3,9]],backend=BB, show=False)
     # k3d
     with pytest.warns(
         UserWarning, match="K3DBackend only works properly within Jupyter Notebook"
@@ -334,6 +403,21 @@ def test_scatterplot():
             np.array([1, 2, 3]), np.array([4, 5, 6]), np.array([7, 8, 9]), backend=KB, show=False
         )
         dtuplot.scatter(np.array([1]), np.array([4]), np.array([7]), backend=KB, show=False)
+        dtuplot.scatter(Matrix([1, 2,3]).T, Matrix([4, 5,6]), Matrix([[4], [5],[6]]), backend=KB, show=False)
+        dtuplot.scatter(np.array([1, 2,3]), Matrix([4, 5,6]), [7,8,9], backend=KB, show=False)
+        dtuplot.scatter(Matrix([-1,0,1]),backend=KB, show=False)
+        dtuplot.scatter(Matrix([0,0,0]),backend=KB, show=False)
+        dtuplot.scatter([1,2,3],backend=KB, show=False)
+        dtuplot.scatter((1,2,3),backend=KB, show=False)
+        dtuplot.scatter(Matrix([1,2,3]),backend=KB, show=False)
+        dtuplot.scatter(np.array([1,2,3]),backend=KB, show=False)
+        dtuplot.scatter([[1,2,3],[4,5,6]],backend=KB, show=False)
+        dtuplot.scatter([(1,2,3),[4,5,6]],backend=KB, show=False)
+        dtuplot.scatter([Matrix([1,2,3]),[4,5,6]],backend=KB, show=False)
+        dtuplot.scatter([Matrix([1,2,3]),Matrix([4,5,6])],backend=KB, show=False)
+        dtuplot.scatter([np.array([1,2,3]),[4,5,6]],backend=KB, show=False)
+        dtuplot.scatter([np.array([1,2,3]),np.array([4,5,6])],backend=KB, show=False)
+        dtuplot.scatter([Matrix([1,2,3]),[4,5,6],(7,8,9), np.array([-2,-1,0])],backend=KB, show=False)
     # mayavi
     with pytest.warns(
         DeprecationWarning
@@ -344,6 +428,21 @@ def test_scatterplot():
             np.array([1, 2, 3]), np.array([4, 5, 6]), np.array([7, 8, 9]), backend=MAB, show=False
         )
         dtuplot.scatter(np.array([1]), np.array([4]), np.array([7]), backend=MAB, show=False)
+        dtuplot.scatter(Matrix([1, 2,3]).T, Matrix([4, 5,6]), Matrix([[4], [5],[6]]), backend=MAB, show=False)
+        dtuplot.scatter(np.array([1, 2,3]), Matrix([4, 5,6]), [7,8,9], backend=MAB, show=False)
+        dtuplot.scatter(Matrix([-1,0,1]),backend=MAB, show=False)
+        dtuplot.scatter(Matrix([0,0,0]),backend=MAB, show=False)
+        dtuplot.scatter([1,2,3],backend=MAB, show=False)
+        dtuplot.scatter((1,2,3),backend=MAB, show=False)
+        dtuplot.scatter(Matrix([1,2,3]),backend=MAB, show=False)
+        dtuplot.scatter(np.array([1,2,3]),backend=MAB, show=False)
+        dtuplot.scatter([[1,2,3],[4,5,6]],backend=MAB, show=False)
+        dtuplot.scatter([(1,2,3),[4,5,6]],backend=MAB, show=False)
+        dtuplot.scatter([Matrix([1,2,3]),[4,5,6]],backend=MAB, show=False)
+        dtuplot.scatter([Matrix([1,2,3]),Matrix([4,5,6])],backend=MAB, show=False)
+        dtuplot.scatter([np.array([1,2,3]),[4,5,6]],backend=MAB, show=False)
+        dtuplot.scatter([np.array([1,2,3]),np.array([4,5,6])],backend=MAB, show=False)
+        dtuplot.scatter([Matrix([1,2,3]),[4,5,6],(7,8,9), np.array([-2,-1,0])],backend=MAB, show=False)
 
     # testing arguments
     dtuplot.scatter(
@@ -372,24 +471,6 @@ def test_scatterplot():
         NotImplementedError, match="Bokeh does not support 3D scatter plots!"
     ):
         dtuplot.scatter([1, 2, 3], [4, 5, 6], [7,8,9], backend=BB, show=False)
-    with pytest.raises(
-        AssertionError, match="Cannot mix matrix and non-matrix arguments!"
-    ):
-        dtuplot.scatter(Matrix([1, 2]), [3, 4], backend=MB, show=False)
-
-    with pytest.raises(
-        AssertionError,
-        match="Matrix must not have multiple dimensions different from size 1!",
-    ):
-        dtuplot.scatter(Matrix([[1, 2, 3], [1, 2, 3]]), Matrix([[1, 2, 3]]), backend=MB, show=False)
-
-    with pytest.raises(AssertionError, match="All matrices must have the same shape!"):
-        dtuplot.scatter(
-            Matrix([1, 2]),
-            Matrix([[1, 2], [2, 3]]),
-            Matrix([[1, 2], [2, 3]]),
-            backend=MB, show=False,
-        )
 
     with pytest.warns(match="non-Expr objects in a Matrix is deprecated."):
         item = Matrix([[[1, 2]]])
@@ -397,3 +478,28 @@ def test_scatterplot():
         AssertionError, match="scatterplot only supports 2D and 3D plots"
     ):
         dtuplot.scatter(item, item, item, item, backend=MB, show=False)
+    
+    with pytest.raises(
+        ValueError, match="Unknown input found"
+    ):
+        dtuplot.scatter(NotImplementedError,NotImplementedError,NotImplementedError, backend=dtuplot.MB, show=False)
+    
+    with pytest.raises(
+        AssertionError, match=re.escape("Points given (single or list of) must be 2D or 3D!")
+    ):
+        dtuplot.scatter(np.array([1,2,3,4]), backend=dtuplot.MB, show=False)
+    
+    with pytest.raises(
+        ValueError, match="Invalid type of coordinate/point"
+    ):
+        dtuplot.scatter([dtuplot], backend=dtuplot.MB, show=False)
+    
+    with pytest.raises(
+        AssertionError, match="Invalid type of coordinate, recieved"
+    ):
+        dtuplot.scatter([[dtuplot]], backend=dtuplot.MB, show=False)
+    
+    with pytest.raises(
+        AssertionError, match="Length of all points in list must match!"
+    ):
+        dtuplot.scatter([[1,2,3],[1,2]], backend=dtuplot.MB, show=False)

@@ -1,4 +1,4 @@
-from sympy import Matrix, Expr
+from sympy import MatrixBase, Expr, Basic, MutableMatrix, ImmutableMatrix
 from sympy.external import import_module
 from spb.functions import plot_list, plot3d_list
 from spb.backends.base_backend import Plot
@@ -31,16 +31,16 @@ def scatter(*args, **kwargs):
     # format all arguments
     dim = 0
     args = list(args)
-    if len(args) == 1 and type(args[0]) in [list, tuple, type(Matrix()), np.ndarray]:
+    if len(args) == 1 and type(args[0]) in [list, tuple, MutableMatrix, ImmutableMatrix, np.ndarray]:
         # Single list/tuple/matrix/array given, assume this is list of (single) point(s)
         coords = [[],[],[]]
         dim = None
         for i, arg in enumerate(args[0]):
-            if type(arg) in [float, int, Expr]:
+            if type(arg) in [float, int, Expr] or np.issubdtype(type(arg), np.integer) or np.issubdtype(type(arg), np.floating) or isinstance(arg, Basic):
                 # the single arg is a single point
                 dim = len(args[0])
                 coords[i].append(float(arg))
-            elif type(arg) in [list, tuple, type(Matrix()), np.ndarray]:
+            elif type(arg) in [list, tuple, MutableMatrix, ImmutableMatrix, np.ndarray]:
                 # Unify format
                 arg = np.array(arg).flatten()
                 # Check dimension
@@ -50,8 +50,10 @@ def scatter(*args, **kwargs):
                     assert len(arg) == dim, "Length of all points in list must match!"
                 # Sort the coordinates into correct bins
                 for o, coord in enumerate(arg):
-                    assert type(coord) in [float, int, Expr], f"Invalid type of coordinate, recieved {coord} with type {type(coord)}"
+                    assert type(coord) in [float, int, Expr] or np.issubdtype(type(coord), np.integer) or np.issubdtype(type(coord), np.floating) or isinstance(coord, Basic), f"Invalid type of coordinate, recieved {coord} with type {str(type(coord))}"
                     coords[o].append(float(coord))
+            else:
+                raise ValueError(f"Invalid type of coordinate/point, recieved {arg} with type {str(type(arg))}, but must be one of [list, tuple, Matrix, np.ndarray, int, float, Expr]!")
             assert dim in [2,3], "Points given (single or list of) must be 2D or 3D!"
         
         if len(coords[-1]) == 0:
@@ -62,7 +64,7 @@ def scatter(*args, **kwargs):
     else:
         # Probably a list of arguments given!
         for i in range(len(args)):
-            if type(args[i]) in (list, tuple, type(Matrix())):
+            if type(args[i]) in (list, tuple, MutableMatrix, ImmutableMatrix):
                 # This is x, y, or z argument. List of these coordinates for each point.
                 args[i] = np.array(args[i]).flatten()
                 dim += 1
@@ -85,7 +87,7 @@ def scatter(*args, **kwargs):
                 except:
                     raise ValueError(f"Unknown input found: {args[i]}")
 
-    assert dim in [2, 3], "scatterplot only supports 2D and 3D plots"
+    assert dim in [2, 3], f"scatterplot only supports 2D and 3D plots, but arguments for dimension {dim} was given."
     if dim == 2:
         Backend = kwargs.pop("backend", TWO_D_B)
         if Backend == KB:
