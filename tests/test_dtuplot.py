@@ -119,18 +119,18 @@ def test_quiver():
                 warning=False,
             )
 
-    with pytest.raises(
-        NotImplementedError, match="Mayavi backend does not support 2D vector plots!"
-    ):
-        dtuplot.quiver([1, 2], [4, 5], backend=MAB, show=False, warning=False)
+        with pytest.raises(
+            NotImplementedError, match="Mayavi backend does not support 2D vector plots!"
+        ):
+            dtuplot.quiver([1, 2], [4, 5], backend=MAB, show=False, warning=False)
 
-    with pytest.warns(
-        UserWarning,
-        match="Because of the Mayavi backend, the origin of the vector might be slightly off. To supress this warning, set 'warning=False'",
-    ):
-        dtuplot.quiver(
-            Matrix([100, 100, 100]), Matrix([10, 20, 30]), backend=dtuplot.MAB
-        )
+        with pytest.warns(
+            UserWarning,
+            match="Because of the Mayavi backend, the origin of the vector might be slightly off. To supress this warning, set 'warning=False'",
+        ):
+            dtuplot.quiver(
+                Matrix([100, 100, 100]), Matrix([10, 20, 30]), backend=dtuplot.MAB
+            )
 
     with pytest.raises(
         NotImplementedError, match="K3D backend does not support 2D vector plots!"
@@ -572,10 +572,11 @@ def test_scatterplot():
     )
 
     # test assertions
-    with pytest.raises(
-        NotImplementedError, match="Mayavi does not support 2D scatter plots!"
-    ):
-        dtuplot.scatter([1, 2, 3], [4, 5, 6], backend=MAB, show=False)
+    if test_mab:
+        with pytest.raises(
+            NotImplementedError, match="Mayavi does not support 2D scatter plots!"
+        ):
+            dtuplot.scatter([1, 2, 3], [4, 5, 6], backend=MAB, show=False)
     with pytest.raises(
         NotImplementedError, match="K3D does not support 2D scatter plots!"
     ):
