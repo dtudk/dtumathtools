@@ -1,19 +1,17 @@
-from sympy import latex, Matrix
-from sympy.external import import_module
-from spb.backends.base_backend import Plot as BP
-from spb.defaults import TWO_D_B, THREE_D_B, cfg
+from spb import MB, PB, BB, KB, MAB
+from spb.defaults import THREE_D_B, TWO_D_B
 from spb.functions import _set_labels
-from spb.series import BaseSeries
-from spb.utils import (
-    _plot_sympify,
-    _unpack_args_extended,
-    _split_vector,
-    _is_range,
-    _instantiate_backend,
-)
+from spb.series import VectorBase
+from spb.utils import _instantiate_backend
+from sympy import Matrix, latex, symbols
+from sympy.external import import_module
+from spb.backends.base_backend import Plot
+import warnings
+
+np = import_module("numpy")
 
 
-class ArrowSeries(BaseSeries):
+class ArrowSeries(VectorBase):
     """Represent a vector field."""
 
     is_vector = True
@@ -22,6 +20,10 @@ class ArrowSeries(BaseSeries):
     _allowed_keys = []
 
     def __init__(self, start, direction, label=None, **kwargs):
+        # Ranges must be given for VectorBase, even though they are None
+        super().__init__(
+            [start, direction], ranges=start.shape[-1] * [None], label=label, **kwargs
+        )
 
         self.start = start
         self.direction = direction
@@ -29,42 +31,62 @@ class ArrowSeries(BaseSeries):
         self._label = f"{start}->{direction}" if label is None else label
         self._latex_label = latex(f"{start}->{direction}") if label is None else label
 
-        self.expr = kwargs.get("expr", "")
+        # Standard for 'use_cm' should be False
         self.use_cm = kwargs.get("use_cm", False)
-        self.color_func = kwargs.get("color_func", None)
-        # NOTE: normalization is achieved at the backend side: this allows to
-        # obtain same length arrows, but colored with the actual magnitude.
-        # If normalization is applied on the series get_data(), the coloring
-        # by magnitude would not be applicable at the backend.
-        self.normalize = kwargs.get("normalize", False)
+        # Linked colormap using vector2d renderer
+        self.use_quiver_solid_color = not self.use_cm
+        # Line color needed for Mayavi
+        self._line_color = kwargs.get("line_color", None)
 
-        self.rendering_kw = kwargs.get("quiver_kw", kwargs.get("rendering_kw", dict()))
-
-        self._set_use_quiver_solid_color(**kwargs)
-        self._init_transforms(**kwargs)
-
-    def _set_use_quiver_solid_color(self, **kwargs):
-        # NOTE: this attribute will inform the backend wheter to use a
-        # color map or a solid color for the quivers. It is placed here
-        # because it simplifies the backend logic when dealing with
-        # plot sums.
-        self.use_quiver_solid_color = (
-            True
-            if ("scalar" not in kwargs.keys())
-            else (
-                False if (not kwargs["scalar"]) or (kwargs["scalar"] is None) else True
-            )
+    def __str__(self):
+        # Overwrite the VectorBase __str__ as it assumes things
+        # about variables that does not hold for this class.
+        return self._str_helper(
+            f"Arrow Series with start point {self.start}, and direction {self.direction}"
         )
 
     def get_data(self):
+        # This format works for both MB and PB
+        # Has to translate to start/end and transpose
+        # such that the x,y,z lims match the arrow
+        # compensation for this in arrow done in
+        # quiverplot_helpers.
+        start = np.array(self.start)
+        end = start + np.array(self.direction)
+        return np.array(
+            [start, end]
+        ).T  # [np.array([v]) for v in list(self.start) + list(self.direction)]
 
-        return *self.start, *self.direction
+
+# Specify 2D class such that this can be linked with renderer
+class Arrow2DSeries(ArrowSeries):
+    is_2Dvector = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+# Specify 3D class such that this can be linked with renderer
+class Arrow3DSeries(ArrowSeries):
+    is_3Dvector = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
 def quiver(*args, **kwargs):
+    """Create a plot with a vector.
 
-    np = import_module("numpy")
+    Args:
+        start (MatrixBase, np.ndarray, list, float): The starting coordinates (2D or 3D) of the vector. Can be given in multitude of ways/inputs.
+        direction (MatrixBase, np.ndarray, list, float): The direction (2D or 3D) of the vector. Can be given in multitude of ways/inputs.
+        rendering_kw (dict, optional): A dictionary forwarded to dtuplot.plot(), see SPB docs for reference.
+        color (str, optional): A string to set the color of the vector with. With no argument color = 'blue'.
+        show (bool, optional): Boolean, if 'True': show plot, other just return object without plotting. Defaults to 'True'.
 
+    Returns:
+        Plot: The vector plot.
+    """
     # format if numbers are entered directly instead of lists
     num_single = 0
     args = list(args)
@@ -88,8 +110,9 @@ def quiver(*args, **kwargs):
         else:
             args = [[args[0], args[1], args[2]], [args[3], args[4], args[5]]]
     elif num_single != 0:
-        raise f"Error! Wrong format used in quiver. Got {num_single} arguments \
-            that could be start or direction vector coordinates!"
+        raise ValueError(
+            f"Error! Wrong format used in quiver. Got {num_single} arguments that could be start or direction vector coordinates!"
+        )
 
     # split arguments into vectors and other arguments
     point_args = []
@@ -114,8 +137,9 @@ def quiver(*args, **kwargs):
         ], "Error! Start and direction vectors must be 2D or 3D!"
         args = otherargs
     except:
-        raise f"Error! Wrong format used in quiver. \
-        Got {point_args[0]} as starting point(s) and {point_args[1]} as ending point(s)!"
+        raise ValueError(
+            f"Error! Wrong format used in quiver. Got {point_args[0]} as starting point(s) and {point_args[1]} as ending point(s)!"
+        )
 
     # want structure to be [list of starts, list of ends]
     # where list of starts could be [start1, start2, ...], either 2D or 3D points
@@ -134,9 +158,10 @@ def quiver(*args, **kwargs):
         labels = [None] * point_args.shape[1]
 
     kwargs.setdefault("legend", True)
+    # params are directly linked with interactive plots
+    # if present, the BaseSeries will activate the 'is_interactive' flag
     params = kwargs.get("params", None)
     is_interactive = False if params is None else True
-    kwargs["is_interactive"] = is_interactive
     if is_interactive:
         raise NotImplementedError("Interactive quiver plots are not yet implemented!")
         from spb.interactive import iplot
@@ -144,25 +169,63 @@ def quiver(*args, **kwargs):
         kwargs["is_vector"] = True
         return iplot(*args, **kwargs)
 
-    series = [
-        ArrowSeries(start, stop, *otherargs, label=label, **kwargs)
-        for start, stop, label in zip(point_args[0, :, :], point_args[1, :, :], labels)
-    ]
-
-    rendering_kw = kwargs.pop("rendering_kw", None)
+    # rendering_kw needs to be passed to the plotting backend, but not
+    # to the series. Thus pulled out here.
+    # Create if it does not exist
+    rendering_kw = kwargs.pop("rendering_kw", {})
+    # normalize argument needs to be passed to series object, but not to
+    # backend. Otherwise warning will be raised. Thus pulled out here.
+    normalize = kwargs.pop("normalize", False)
 
     # if 2D
     if point_args.shape[-1] == 2:
         Backend = kwargs.pop("backend", TWO_D_B)
-        for i in range(len(series)):
-            series[i].rendering_kw["angles"] = "xy"
-            series[i].rendering_kw["scale_units"] = "xy"
-            series[i].rendering_kw["scale"] = 1
-            series[i].is_2Dvector = True
+        Series = Arrow2DSeries
+
+        # Specific for matplotlib backend
+        if Backend == MB:
+            # Update values for length of vector to fit
+            rendering_kw.setdefault("angles", "xy")
+            rendering_kw.setdefault("scale_units", "xy")
+            rendering_kw.setdefault("scale", 1)
+        elif Backend == PB:
+            rendering_kw.setdefault("scale", 1)
+            rendering_kw.setdefault("scaleratio", 1)
+        elif Backend == BB:
+            mag = np.linalg.norm(point_args[-1].flatten(), 2)
+            rendering_kw.setdefault("scale", mag)
+            rendering_kw.setdefault("pivot", "tail")
+        elif Backend == KB:
+            raise NotImplementedError("K3D backend does not support 2D vector plots!")
+        elif Backend == MAB:
+            raise NotImplementedError(
+                "Mayavi backend does not support 2D vector plots!"
+            )
     else:
         Backend = kwargs.pop("backend", THREE_D_B)
-        for i in range(len(series)):
-            series[i].is_3Dvector = True
+        Series = Arrow3DSeries
+
+        if Backend == PB:
+            rendering_kw.setdefault("sizeref", 1)
+            rendering_kw.setdefault("sizemode", "scaled")
+            rendering_kw.setdefault("anchor", "tail")  # point_args[0,0]
+        elif Backend == BB:
+            raise NotImplementedError("Bokeh backend does not support 3D vector plots!")
+        elif Backend == KB:
+            rendering_kw.setdefault("pivot", "tail")
+        elif Backend == MAB:
+            rendering_kw.setdefault("scale_factor", 1)
+            rendering_kw.setdefault("resolution", 100)
+            display_warning = kwargs.pop("warning", True)
+            if display_warning:
+                warnings.warn(
+                    f"Because of the Mayavi backend, the origin of the vector might be slightly off. To supress this warning, set 'warning=False'"
+                )
+
+    series = [
+        Series(start, stop, *otherargs, label=label, normalize=normalize, **kwargs)
+        for start, stop, label in zip(point_args[0, :, :], point_args[1, :, :], labels)
+    ]
 
     _set_labels(series, labels, rendering_kw)
 

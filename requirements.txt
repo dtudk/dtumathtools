@@ -1,16 +1,16 @@
-sympy-plot-backends>=1.6.6,<=1.6.7
-sympy>=1.10.1
-matplotlib>=3.2
+sympy-plot-backends~=2.4
+sympy~=1.12
+matplotlib==3.6.*
 jupyter>=1.0.0
-numpy>=1.21.1,<1.24
+numpy>=1.24
 
 # --- Packages related to different backends ---
-# PyQt5>=5.15.7
+# PyQt5~=5.15.9
 # plotly>=4.14.3
 # ipympl>=0.7.0
 # mayavi>=4.8.0
-# panel>=0.13.0
+# ipyevents
+# panel>=1.0.0
 # ipywidgets_bokeh
 # k3d>=2.9.7
 # vtk
-# mayavi>=4.8.0
