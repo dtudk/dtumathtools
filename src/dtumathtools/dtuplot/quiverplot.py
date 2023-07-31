@@ -49,11 +49,13 @@ class ArrowSeries(VectorBase):
         # This format works for both MB and PB
         # Has to translate to start/end and transpose
         # such that the x,y,z lims match the arrow
-        # compensation for this in arrow done in 
+        # compensation for this in arrow done in
         # quiverplot_helpers.
         start = np.array(self.start)
         end = start + np.array(self.direction)
-        return np.array([start, end]).T# [np.array([v]) for v in list(self.start) + list(self.direction)]
+        return np.array(
+            [start, end]
+        ).T  # [np.array([v]) for v in list(self.start) + list(self.direction)]
 
 
 # Specify 2D class such that this can be linked with renderer
@@ -70,6 +72,7 @@ class Arrow3DSeries(ArrowSeries):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
 
 def quiver(*args, **kwargs):
     """Create a plot with a vector.
@@ -107,7 +110,9 @@ def quiver(*args, **kwargs):
         else:
             args = [[args[0], args[1], args[2]], [args[3], args[4], args[5]]]
     elif num_single != 0:
-        raise ValueError(f"Error! Wrong format used in quiver. Got {num_single} arguments that could be start or direction vector coordinates!")
+        raise ValueError(
+            f"Error! Wrong format used in quiver. Got {num_single} arguments that could be start or direction vector coordinates!"
+        )
 
     # split arguments into vectors and other arguments
     point_args = []
@@ -132,7 +137,9 @@ def quiver(*args, **kwargs):
         ], "Error! Start and direction vectors must be 2D or 3D!"
         args = otherargs
     except:
-        raise ValueError(f"Error! Wrong format used in quiver. Got {point_args[0]} as starting point(s) and {point_args[1]} as ending point(s)!")
+        raise ValueError(
+            f"Error! Wrong format used in quiver. Got {point_args[0]} as starting point(s) and {point_args[1]} as ending point(s)!"
+        )
 
     # want structure to be [list of starts, list of ends]
     # where list of starts could be [start1, start2, ...], either 2D or 3D points
@@ -185,21 +192,23 @@ def quiver(*args, **kwargs):
             rendering_kw.setdefault("scale", 1)
             rendering_kw.setdefault("scaleratio", 1)
         elif Backend == BB:
-            mag = np.linalg.norm(point_args[-1].flatten(),2)
+            mag = np.linalg.norm(point_args[-1].flatten(), 2)
             rendering_kw.setdefault("scale", mag)
             rendering_kw.setdefault("pivot", "tail")
         elif Backend == KB:
             raise NotImplementedError("K3D backend does not support 2D vector plots!")
         elif Backend == MAB:
-            raise NotImplementedError("Mayavi backend does not support 2D vector plots!")
+            raise NotImplementedError(
+                "Mayavi backend does not support 2D vector plots!"
+            )
     else:
         Backend = kwargs.pop("backend", THREE_D_B)
         Series = Arrow3DSeries
-        
+
         if Backend == PB:
             rendering_kw.setdefault("sizeref", 1)
             rendering_kw.setdefault("sizemode", "scaled")
-            rendering_kw.setdefault("anchor", "tail") #point_args[0,0]
+            rendering_kw.setdefault("anchor", "tail")  # point_args[0,0]
         elif Backend == BB:
             raise NotImplementedError("Bokeh backend does not support 3D vector plots!")
         elif Backend == KB:
@@ -214,7 +223,7 @@ def quiver(*args, **kwargs):
                 )
 
     series = [
-        Series(start, stop,*otherargs, label=label, normalize=normalize, **kwargs)
+        Series(start, stop, *otherargs, label=label, normalize=normalize, **kwargs)
         for start, stop, label in zip(point_args[0, :, :], point_args[1, :, :], labels)
     ]
 

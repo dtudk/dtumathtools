@@ -2,7 +2,8 @@ from spb.functions import plot_parametric
 from sympy.matrices import MatrixBase
 from spb.backends.base_backend import Plot
 
-def plot_boundary(param_func: MatrixBase, *args, **kwargs)->(Plot):
+
+def plot_boundary(param_func: MatrixBase, *args, **kwargs) -> (Plot):
     """A function for plotting the boundary of a 2D area
 
     Args:
@@ -25,7 +26,7 @@ def plot_boundary(param_func: MatrixBase, *args, **kwargs)->(Plot):
                 if isinstance(arg[1], list):
                     bounds[-1] = (arg[0], *arg[1])
             else:
-                rest = args[i+1:]
+                rest = args[i + 1 :]
                 args = rest
                 break
         else:
@@ -33,29 +34,35 @@ def plot_boundary(param_func: MatrixBase, *args, **kwargs)->(Plot):
         if len(bounds) != 2:
             raise ValueError("For 2D-areas two variables are needed to plot boundary")
 
-        show = kwargs.pop('show', True)
-        color = kwargs.pop('color', 'blue')
-        adaptive = kwargs.setdefault('adaptive', False)
+        show = kwargs.pop("show", True)
+        color = kwargs.pop("color", "blue")
+        adaptive = kwargs.setdefault("adaptive", False)
         plot = plot_parametric(show=False)
         for i in range(2):
-            plot += plot_parametric(*param_func.subs(bounds[i][0], bounds[i][1]),
-                                        (bounds[1-i][0], *bounds[1-i][1:]), 
-                                        {'color': color}, *args, 
-                                        show=False, **kwargs
+            plot += plot_parametric(
+                *param_func.subs(bounds[i][0], bounds[i][1]),
+                (bounds[1 - i][0], *bounds[1 - i][1:]),
+                {"color": color},
+                *args,
+                show=False,
+                **kwargs
             )
-            plot += plot_parametric(*param_func.subs(bounds[i][0], bounds[i][2]),
-                                        (bounds[1-i][0], *bounds[1-i][1:]), 
-                                        {'color': color}, *args, 
-                                        show=False, **kwargs
+            plot += plot_parametric(
+                *param_func.subs(bounds[i][0], bounds[i][2]),
+                (bounds[1 - i][0], *bounds[1 - i][1:]),
+                {"color": color},
+                *args,
+                show=False,
+                **kwargs
             )
     elif len(param_func) == 3:
-        raise NotImplementedError('Volume boundary plots are not yet implemented')
+        raise NotImplementedError("Volume boundary plots are not yet implemented")
 
-    plot.legend = kwargs.pop('legend', False)
-    plot.xlabel = kwargs.pop('xlabel', 'x')
-    plot.ylabel = kwargs.pop('ylabel', 'y')
-    plot.zlabel = kwargs.pop('zlabel', 'z')
-    plot.aspect = kwargs.pop('aspect', 'auto')
+    plot.legend = kwargs.pop("legend", False)
+    plot.xlabel = kwargs.pop("xlabel", "x")
+    plot.ylabel = kwargs.pop("ylabel", "y")
+    plot.zlabel = kwargs.pop("zlabel", "z")
+    plot.aspect = kwargs.pop("aspect", "auto")
 
     if show:
         plot.show()

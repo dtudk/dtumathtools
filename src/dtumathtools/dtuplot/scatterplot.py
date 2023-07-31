@@ -31,12 +31,23 @@ def scatter(*args, **kwargs):
     # format all arguments
     dim = 0
     args = list(args)
-    if len(args) == 1 and type(args[0]) in [list, tuple, MutableMatrix, ImmutableMatrix, np.ndarray]:
+    if len(args) == 1 and type(args[0]) in [
+        list,
+        tuple,
+        MutableMatrix,
+        ImmutableMatrix,
+        np.ndarray,
+    ]:
         # Single list/tuple/matrix/array given, assume this is list of (single) point(s)
-        coords = [[],[],[]]
+        coords = [[], [], []]
         dim = None
         for i, arg in enumerate(args[0]):
-            if type(arg) in [float, int, Expr] or np.issubdtype(type(arg), np.integer) or np.issubdtype(type(arg), np.floating) or isinstance(arg, Basic):
+            if (
+                type(arg) in [float, int, Expr]
+                or np.issubdtype(type(arg), np.integer)
+                or np.issubdtype(type(arg), np.floating)
+                or isinstance(arg, Basic)
+            ):
                 # the single arg is a single point
                 dim = len(args[0])
                 coords[i].append(float(arg))
@@ -50,16 +61,23 @@ def scatter(*args, **kwargs):
                     assert len(arg) == dim, "Length of all points in list must match!"
                 # Sort the coordinates into correct bins
                 for o, coord in enumerate(arg):
-                    assert type(coord) in [float, int, Expr] or np.issubdtype(type(coord), np.integer) or np.issubdtype(type(coord), np.floating) or isinstance(coord, Basic), f"Invalid type of coordinate, recieved {coord} with type {str(type(coord))}"
+                    assert (
+                        type(coord) in [float, int, Expr]
+                        or np.issubdtype(type(coord), np.integer)
+                        or np.issubdtype(type(coord), np.floating)
+                        or isinstance(coord, Basic)
+                    ), f"Invalid type of coordinate, recieved {coord} with type {str(type(coord))}"
                     coords[o].append(float(coord))
             else:
-                raise ValueError(f"Invalid type of coordinate/point, recieved {arg} with type {str(type(arg))}, but must be one of [list, tuple, Matrix, np.ndarray, int, float, Expr]!")
-            assert dim in [2,3], "Points given (single or list of) must be 2D or 3D!"
-        
+                raise ValueError(
+                    f"Invalid type of coordinate/point, recieved {arg} with type {str(type(arg))}, but must be one of [list, tuple, Matrix, np.ndarray, int, float, Expr]!"
+                )
+            assert dim in [2, 3], "Points given (single or list of) must be 2D or 3D!"
+
         if len(coords[-1]) == 0:
             assert dim == 2, "Unspecified error!"
             del coords[-1]
-        
+
         args = coords
     else:
         # Probably a list of arguments given!
@@ -87,7 +105,10 @@ def scatter(*args, **kwargs):
                 except:
                     raise ValueError(f"Unknown input found: {args[i]}")
 
-    assert dim in [2, 3], f"scatterplot only supports 2D and 3D plots, but arguments for dimension {dim} was given."
+    assert dim in [
+        2,
+        3,
+    ], f"scatterplot only supports 2D and 3D plots, but arguments for dimension {dim} was given."
     if dim == 2:
         Backend = kwargs.pop("backend", TWO_D_B)
         if Backend == KB:
@@ -98,22 +119,29 @@ def scatter(*args, **kwargs):
         markersize = rendering_kw.pop("s", None)
         if markersize is not None:
             rendering_kw.setdefault("markersize", markersize)
-        return plot_list(*args, is_point=True, rendering_kw=rendering_kw, backend=Backend, **kwargs)
+        return plot_list(
+            *args, is_point=True, rendering_kw=rendering_kw, backend=Backend, **kwargs
+        )
     else:
         Backend = kwargs.pop("backend", THREE_D_B)
         if Backend == BB:
             raise NotImplementedError("Bokeh does not support 3D scatter plots!")
         return plot3d_list(*args, is_point=True, backend=Backend, **kwargs)
 
+
 # Adjust renderer for Mayavi to support 3D scatter plotting
-from spb.backends.mayavi.renderers.line3d import _draw_line3d_helper, _update_line3d_helper
+from spb.backends.mayavi.renderers.line3d import (
+    _draw_line3d_helper,
+    _update_line3d_helper,
+)
 from spb.backends.base_renderer import Renderer
+
+
 def MAB_draw_line3d_helper(renderer, data):
     x, y, z = data
     u = np.ones_like(x)
-    return _draw_line3d_helper(renderer, (x,y,z,u))
+    return _draw_line3d_helper(renderer, (x, y, z, u))
+
 
 class Point3DRenderer(Renderer):
-    draw_update_map = {
-        MAB_draw_line3d_helper: _update_line3d_helper
-    }
+    draw_update_map = {MAB_draw_line3d_helper: _update_line3d_helper}

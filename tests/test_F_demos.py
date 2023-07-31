@@ -1222,57 +1222,99 @@ def test_week6():
 def test_week7():
     # Store dag
     assert True
-    x,y,z,u = symbols("x y z u",real=True)
-    r1 = Matrix([cos(u),sin(u),u/2])
-    r2 = Matrix([1,0,u/2])
-    V = Matrix([-y,x,2*z])
-    u_range = (u,0,4*pi)
+    x, y, z, u = symbols("x y z u", real=True)
+    r1 = Matrix([cos(u), sin(u), u / 2])
+    r2 = Matrix([1, 0, u / 2])
+    V = Matrix([-y, x, 2 * z])
+    u_range = (u, 0, 4 * pi)
 
-    K1 = dtuplot.plot3d_parametric_line(*r1,u_range,show=False,rendering_kw={"color":"red"})
-    K2 = dtuplot.plot3d_parametric_line(*r2,u_range,show=False,rendering_kw={"color":"blue"})
-    felt = dtuplot.plot_vector(V,(x,-1,1),(y,-1,1),(z,0,6),show=False,quiver_kw={"alpha":0.5,"length":0.1,"color":"black"},n=5)
+    K1 = dtuplot.plot3d_parametric_line(
+        *r1, u_range, show=False, rendering_kw={"color": "red"}
+    )
+    K2 = dtuplot.plot3d_parametric_line(
+        *r2, u_range, show=False, rendering_kw={"color": "blue"}
+    )
+    felt = dtuplot.plot_vector(
+        V,
+        (x, -1, 1),
+        (y, -1, 1),
+        (z, 0, 6),
+        show=False,
+        quiver_kw={"alpha": 0.5, "length": 0.1, "color": "black"},
+        n=5,
+    )
 
     combined = K1 + K2 + felt
     combined.legend = False
     r1d = r1.diff(u)
     r2d = r2.diff(u)
-    integrand1 = V.subs({x:r1[0],y:r1[1],z:r1[2]}).dot(r1d)
-    integrand2 = V.subs({x:r2[0],y:r2[1],z:r2[2]}).dot(r2d)
-    integrand1.simplify(),integrand2.simplify()
-    assert integrate(integrand1,(u,0,4*pi)) == 4*pi+4*pi**2
-    assert integrate(integrand2,(u,0,4*pi)) == 4*pi**2
+    integrand1 = V.subs({x: r1[0], y: r1[1], z: r1[2]}).dot(r1d)
+    integrand2 = V.subs({x: r2[0], y: r2[1], z: r2[2]}).dot(r2d)
+    integrand1.simplify(), integrand2.simplify()
+    assert integrate(integrand1, (u, 0, 4 * pi)) == 4 * pi + 4 * pi**2
+    assert integrate(integrand2, (u, 0, 4 * pi)) == 4 * pi**2
 
-    u_range = (u,0,1)
-    r1 = dtuplot.plot3d_parametric_line(u,0,0,u_range,show=False,rendering_kw={"color":"red"})
-    r2 = dtuplot.plot3d_parametric_line(1,u,0,u_range,show=False,rendering_kw={"color":"red"})
-    r3 = dtuplot.plot3d_parametric_line(1,1,u,u_range,show=False,rendering_kw={"color":"red"})
-    xyz = dtuplot.scatter(Matrix([1,1,1]),show=False,rendering_kw={"color":"black"})
+    u_range = (u, 0, 1)
+    r1 = dtuplot.plot3d_parametric_line(
+        u, 0, 0, u_range, show=False, rendering_kw={"color": "red"}
+    )
+    r2 = dtuplot.plot3d_parametric_line(
+        1, u, 0, u_range, show=False, rendering_kw={"color": "red"}
+    )
+    r3 = dtuplot.plot3d_parametric_line(
+        1, 1, u, u_range, show=False, rendering_kw={"color": "red"}
+    )
+    xyz = dtuplot.scatter(
+        Matrix([1, 1, 1]), show=False, rendering_kw={"color": "black"}
+    )
     combined = r1 + r2 + r3 + xyz
     combined.legend = False
-    combined.camera = {"azim":37,"elev":16}
+    combined.camera = {"azim": 37, "elev": 16}
 
-    r1 = Matrix([u,0,0])
-    r2 = Matrix([x,u,0])
-    r3 = Matrix([x,y,u])
+    r1 = Matrix([u, 0, 0])
+    r2 = Matrix([x, u, 0])
+    r3 = Matrix([x, y, u])
     r1d = r1.diff(u)
     r2d = r2.diff(u)
     r3d = r3.diff(u)
-    r1d,r2d,r3d
+    r1d, r2d, r3d
 
-    V = Matrix([y ** 2 + z, 2*y*z**2 + 2*y*x,2*y**2*z+x])
-    integrand1 = V[0].subs({x:u,y:0,z:0})
-    integrand2 = V[1].subs({y:u,z:0})
-    integrand3 = V[2].subs({z:u})
+    V = Matrix([y**2 + z, 2 * y * z**2 + 2 * y * x, 2 * y**2 * z + x])
+    integrand1 = V[0].subs({x: u, y: 0, z: 0})
+    integrand2 = V[1].subs({y: u, z: 0})
+    integrand3 = V[2].subs({z: u})
     assert integrand1 == 0
-    assert integrand2 == 2*u*x
-    assert integrand3 == 2*u*y**2+x
-    F = integrate(integrand1,(u,0,x)) + integrate(integrand2,(u,0,y)) + integrate(integrand3,(u,0,z))
+    assert integrand2 == 2 * u * x
+    assert integrand3 == 2 * u * y**2 + x
+    F = (
+        integrate(integrand1, (u, 0, x))
+        + integrate(integrand2, (u, 0, y))
+        + integrate(integrand3, (u, 0, z))
+    )
     V_F = dtutools.gradient(F)
-    assert Eq(V_F,V) == True
+    assert Eq(V_F, V) == True
     t = symbols("t")
-    knude = Matrix([-10*cos(t)-2*cos(5*t)+15*sin(2*t),-15*cos(2*t)+10*sin(t)-2*sin(5*t),10*cos(3*t)]) * S(1)/10
-    dtuplot.plot3d_parametric_line(*knude,(t,-pi,pi),rendering_kw={"color":"blue"},legend=False, show=False)
-    assert integrate(V.subs({x:knude[0],y:knude[1],z:knude[2]}).dot(knude.diff(t)),(t,-pi,pi)) == 0
+    knude = (
+        Matrix(
+            [
+                -10 * cos(t) - 2 * cos(5 * t) + 15 * sin(2 * t),
+                -15 * cos(2 * t) + 10 * sin(t) - 2 * sin(5 * t),
+                10 * cos(3 * t),
+            ]
+        )
+        * S(1)
+        / 10
+    )
+    dtuplot.plot3d_parametric_line(
+        *knude, (t, -pi, pi), rendering_kw={"color": "blue"}, legend=False, show=False
+    )
+    assert (
+        integrate(
+            V.subs({x: knude[0], y: knude[1], z: knude[2]}).dot(knude.diff(t)),
+            (t, -pi, pi),
+        )
+        == 0
+    )
 
     # Lille dag
     x, y, z = symbols("x y z")
