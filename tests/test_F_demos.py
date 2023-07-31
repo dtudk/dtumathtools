@@ -533,8 +533,6 @@ def test_week3():
     fxy = f.diff(x, y)
     fyy = f.diff(y, 2)
     H = Matrix([[fxx, fxy], [fxy, fyy]])
-    print(H)
-    print(Matrix([[(6 * (x - 1)).factor(), 0], [0, (6 * (y - 1)).factor()]]))
     assert H == Matrix([[(6 * (x - 1)).factor(), 0], [0, (6 * (y - 1)).factor()]])
     [H.subs([(x, x0), (y, y0)]) for (x0, y0) in sols]
     assert dtutools.taylor(f, [x, 0, y, 0], 3) == -3 * x**2 - 3 * y**2
@@ -550,8 +548,10 @@ def test_week3():
         wireframe=True,
         rendering_kw={"alpha": 0.6},
     )
+    # Following command changed, as the scatter function changed. 
+    # Each point is now given in a list, so '*' is removed.
     points = dtuplot.scatter(
-        *[Matrix([x0, y0, f.subs([(x, x0), (y, y0)])]) for (x0, y0) in sols],
+        [Matrix([x0, y0, f.subs([(x, x0), (y, y0)])]) for (x0, y0) in sols],
         show=False,
         rendering_kw={"s": 100, "color": "red"}
     )
@@ -587,8 +587,10 @@ def test_week3():
         show=False,
         rendering_kw={"alpha": 0.5},
     )
+    # Following command changed, as the scatter function changed. 
+    # Each point is now given in a list, so '*' is removed.
     points = dtuplot.scatter(
-        *[Matrix([x0, y0, f.subs([(x, x0), (y, y0)])]) for x0, y0 in stat_punkter],
+        [Matrix([x0, y0, f.subs([(x, x0), (y, y0)])]) for x0, y0 in stat_punkter],
         show=False,
         rendering_kw={"color": "red", "s": 30}
     )
@@ -650,9 +652,11 @@ def test_week3():
     pf = dtuplot.plot3d(
         f, (x, 0, 2), (y, -1, 1), show=False, rendering_kw={"alpha": 0.7}
     )
+    # Following command changed, as the scatter function changed. 
+    # Each point is now given in a list, so '[]' is added.
     punkter = dtuplot.scatter(
-        Matrix([2, -1, 0]),
-        Matrix([1 / 2, 0, 13 / 4]),
+        [Matrix([2, -1, 0]),
+        Matrix([1 / 2, 0, 13 / 4])],
         show=False,
         rendering_kw={"color": "red", "s": 20},
     )
