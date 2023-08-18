@@ -1,0 +1,100 @@
+[project.optional-dependencies]
+
+
+# TODO probably these should not be here:
+ipympl = ["ipympl>=0.7.0"]
+plotly = ["plotly>=4.14.3"]
+bokeh = [
+    "panel>=1.0.0",
+    "ipywidgets_bokeh",
+]
+k3d = [
+    "vtk",
+    "k3d>=2.9.7",
+]
+qt = ["PyQt5~=5.15.9"]
+myavi = [
+    "PyQt5~=5.15.9",
+    "vtk",
+    "ipyevents",
+    "mayavi @ git+https://git@github.com/enthought/mayavi",
+]
+
+# We currently do not have an extra deps
+
+
+# Customary, the test is for ci-builds
+test = [
+    "pytest",
+]
+# checking formatting with flake8 and black
+dev = [
+    "flake8",
+    "black",
+]
+
+
+[build-system]
+
+requires = [
+    "setuptools_scm[toml]>=6.2",
+    "setuptools",
+]
+
+build-backend = "setuptools.build_meta"
+
+[project]
+
+version = "2023.1.0"
+
+dependencies = [
+    "sympy-plot-backends~=2.4",
+    "sympy~=1.12", 
+    "matplotlib==3.6.*", 
+    "jupyter>=1.0.0", 
+    "numpy>=1.24",
+]
+requires-python = ">=3.8,<3.12"
+
+# generic information
+
+name = "dtumathtools"
+authors = [
+    {name = "Christian Mikkelstrup", email = "s194345@student.dtu.dk"},
+    {name = "Hans Henrik Hermansen", email = "s194042@student.dtu.dk"},
+]
+maintainers = [
+    {name = "Christian Mikkelstrup", email = "s194345@student.dtu.dk"},
+]
+
+description = "A plotting package for the Mathematics 1 course at the Technical University of Denmark"
+readme = {file = "README.md", content-type = "text/markdown"}
+license = "BSD-3-Clause"
+
+# the URL
+url = "https://github.com/dtudk/dtumathtools"
+
+classifiers = [
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Education",
+    "Topic :: Education",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+[project.urls]
+Url = "https://github.com/dtudk/dtumathtools"
+Homepage = "https://github.com/dtudk/dtumathtools"
+Releases = "https://github.com/dtudk/dtumathtools/releases"
+Documentation = "https://github.com/dtudk/dtumathtools"
+Repository = "https://github.com/dtudk/dtumathtools.git"
+Source = "https://github.com/dtudk/dtumathtools"
+Tracker = "https://github.com/dtudk/dtumathtools/issues"
+Discussions = "https://github.com/dtudk/dtumathtools/discussions"
+Chat = "https://discord.gg/h8EVaV9ShP"
