@@ -1,7 +1,7 @@
-# DTUMathTools
+# dtumathtools
 
 ## Description
-This package is a collection of easy-to-use commands for plotting using SymPy. It is designed to fit the requirements of *01005 - Advanced Mathematics in Engineering 1* course at the Technical University of Denmark, found [here](https://01005.compute.dtu.dk/). This includes, but is not limited to:
+This package is a collection of easy-to-use commands for plotting using SymPy. It is designed to fit the requirements of *01001 - Mathematics 1* course at the Technical University of Denmark, found [here](https://01001.compute.dtu.dk/). This includes, but is not limited to:
 
 - Plotting of vector fields and vectors
 - 2D plotting of SymPy functions
@@ -22,16 +22,13 @@ Then one can import all the utility by writing
 All plotting functionality can be found using *dtuplot.xxx* (including all spb plotting functions).
 
 ## Usage
-Use is designed for the *01005 - Advanced Mathematics in Engineering 1* course at the Technical University of Denmark. Any use-case outside this scope is thus not considered, but very welcome!
+Use is designed for the *01001 - Mathematics 1* course at the Technical University of Denmark. Any use-case outside this scope is thus not considered, but very welcome!
 
 ## Contributing
-You are very welcome to contribute in the way that makes sense to you! The development team will consider all pull requests at the repo [here](https://github.com/Chrillebon/DTUMathTools), as well as mails directly to the developers ``s194345@student.dtu.dk`` or ``s194042@student.dtu.dk``. For changes to plotting functionality outside *scatter* and *quiver*, direct queries to [spb](https://github.com/Davide-sd/sympy-plot-backends).
+You are very welcome to contribute in the way that makes sense to you! The development team will consider all pull requests at the repo [here](https://github.com/dtudk/dtumathtools). For changes to plotting functionality outside *scatter* and *quiver*, direct queries to [spb](https://github.com/Davide-sd/sympy-plot-backends).
 
 ## Authors and acknowledgment
 The project would have never gotten off the ground without Jakob Lemvig and his engagement with SymPy in Mathematics 1. Thank you to Ulrik Engelund Pedersen for trusting us with this task. Finally, a huge thanks to the professors of the course for making great and engaging education: Micheal Pedersen and Karsten Schmidt.
 
 ## License
 Open-source under the BSD license. This means that you are free to use it whatever you like, be it academic, commercial, creating forks or derivatives, as long as you copy the BSD statement if you redistribute it (see the LICENSE file for details).
-
-## Project status
-This package is in beta. It is deemed good enough for it to be used in the course material from February 2023, and is expected to be refined after feedback from the students that end up using it.

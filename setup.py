@@ -70,5 +70,6 @@ setup(
         "k3d": _k3d,
         "all": _extra_deps,
         "dev": _dev_deps,
+        "test": ["pytest"],
     },
 )
