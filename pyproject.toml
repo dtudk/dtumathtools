@@ -7,6 +7,7 @@ plotly = ["plotly>=4.14.3"]
 bokeh = [
     "panel>=1.0.0",
     "ipywidgets_bokeh",
+    "colorcet",
 ]
 k3d = [
     "vtk",
@@ -19,8 +20,6 @@ myavi = [
     "ipyevents",
     "mayavi @ git+https://git@github.com/enthought/mayavi",
 ]
-
-# We currently do not have an extra deps
 
 
 # Customary, the test is for ci-builds
