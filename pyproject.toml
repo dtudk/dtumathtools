@@ -69,10 +69,7 @@ maintainers = [
 
 description = "A plotting package for the Mathematics 1 course at the Technical University of Denmark"
 readme = {file = "README.md", content-type = "text/markdown"}
-license = "BSD-3-Clause"
-
-# the URL
-url = "https://github.com/dtudk/dtumathtools"
+license = {text = "BSD-3-Clause"}
 
 classifiers = [
     "Programming Language :: Python :: 3 :: Only",
