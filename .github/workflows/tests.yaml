@@ -25,7 +25,7 @@ jobs:
 
       - name: Install using flags
         run: |
-          pip install .[test]
+          pip install .[ipympl,plotly,bokeh,k3d,qt,myavi,test]
 
       - name: Test with pytest
         run: pytest

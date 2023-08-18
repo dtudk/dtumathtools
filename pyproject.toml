@@ -20,8 +20,6 @@ myavi = [
     "mayavi @ git+https://git@github.com/enthought/mayavi",
 ]
 
-# We currently do not have an extra deps
-
 
 # Customary, the test is for ci-builds
 test = [
