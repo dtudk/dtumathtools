@@ -33,6 +33,3 @@ jobs:
       - name: Install using flags
         run: |
           pip install .[${{ matrix.extras }}]
-
-      - name: Test with pytest
-        run: pytest
