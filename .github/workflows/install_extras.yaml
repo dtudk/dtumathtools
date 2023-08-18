@@ -1,4 +1,4 @@
-name: Tests
+name: Check all install extras
 
 on:
   push:
