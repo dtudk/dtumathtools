@@ -13,9 +13,9 @@ k3d = [
     "vtk",
     "k3d>=2.9.7",
 ]
-qt = ["PyQt5~=5.15.9"]
+qt = ["PyQt5>=5.15.9"]
 myavi = [
-    "PyQt5~=5.15.9",
+    "PyQt5>=5.15.9",
     "vtk",
     "ipyevents",
     "mayavi @ git+https://git@github.com/enthought/mayavi",
@@ -47,13 +47,17 @@ build-backend = "setuptools.build_meta"
 version = "2023.1.0"
 
 dependencies = [
-    "sympy-plot-backends~=2.4",
-    "sympy~=1.12", 
-    "matplotlib==3.6.*", 
+    "sympy-plot-backends>=2.4",
+    "sympy>=1.12", 
+    "matplotlib>=3.6", 
     "jupyter>=1.0.0", 
     "numpy>=1.24",
+    "bokeh",
+    "plotly",
+    "colorcet",
+    "k3d"
 ]
-requires-python = ">=3.8,<3.12"
+requires-python = ">=3.8"
 
 # generic information
 
@@ -76,6 +80,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Development Status :: 4 - Beta",

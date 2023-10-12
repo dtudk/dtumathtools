@@ -1,6 +1,6 @@
-sympy-plot-backends~=2.4
-sympy~=1.12
-matplotlib==3.6.*
+sympy-plot-backends>=2.4
+sympy>=1.12
+matplotlib>=3.6
 jupyter>=1.0.0
 numpy>=1.24
 
