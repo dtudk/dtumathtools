@@ -1,6 +1,11 @@
 [project.optional-dependencies]
 
 
+## REMARK ##
+#----------#
+# when changing these details, remember to reflect
+# this in the conda-forge/dtumathtools-feedstock
+
 # TODO probably these should not be here:
 ipympl = ["ipympl>=0.7.0"]
 plotly = ["plotly>=4.14.3"]
@@ -14,7 +19,7 @@ k3d = [
     "k3d>=2.9.7",
 ]
 qt = ["PyQt5~=5.15.9"]
-myavi = [
+mayavi = [
     "PyQt5~=5.15.9",
     "vtk",
     "ipyevents",
@@ -37,7 +42,6 @@ dev = [
 
 requires = [
     "setuptools_scm[toml]>=6.2",
-    "setuptools",
 ]
 
 build-backend = "setuptools.build_meta"

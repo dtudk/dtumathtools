@@ -20,7 +20,7 @@ jobs:
           - bokeh
           - k3d
           - qt
-          - myavi
+          - mayavi
           - test
 
     steps:
