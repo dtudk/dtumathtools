@@ -197,3 +197,16 @@ def l2_norm(v: MatrixBase) -> (Expr):
         Expr: The L2 norm of the matrix
     """
     return sqrt(sum(x**2 for x in v))
+
+
+def display_variable(varname: str):
+    """Displays an expression stored in a python variable varname as "varname = expression ...."
+    Args:
+        varname: Then name of the python variable to be displayed.
+    Raises:
+        Exception: Variable varname does not exist.
+    Returns:
+        Nothing
+    """
+    assert varname in globals(), f"Variable {varname} does not exist"
+    display(Eq(Symbol(varname), globals()[varname]))
