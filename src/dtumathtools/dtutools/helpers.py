@@ -5,6 +5,7 @@ from typing import Union, Optional, List
 import warnings
 from sympy.core import Symbol, Expr
 from sympy.matrices import MatrixBase
+import inspect
 
 
 def _extract_vars(expr: Expr) -> (List[Symbol]):
@@ -199,14 +200,34 @@ def l2_norm(v: MatrixBase) -> (Expr):
     return sqrt(sum(x**2 for x in v))
 
 
-def display_variable(varname: str):
+def display_equality(lhs: str | Expr, rhs: str | Expr):
+    """Displays two sympy expressions or symbols separated by the equality symbol"
+    Args:
+        lhs: The left hand side of the equality.
+        rhs: The right hand side of the equality.
+    Returns:
+        Nothing
+    """
+    if type(lhs) is str:
+        lhs =  Symbol(lhs)
+    if type(rhs) is str:
+        rhs =  Symbol(rhs)
+    display(Eq(lhs, rhs))
+
+
+def display_definition(varname: str, rhs: Optional[Expr] = None):
     """Displays an expression stored in a python variable varname as "varname = expression ...."
     Args:
-        varname: Then name of the python variable to be displayed.
+        varname: The name of the python variable to be displayed on the left hand side.
+        rhs: An optional sympy Expr to be displayed on the right hand side instead of the actual variable definition.
     Raises:
         Exception: Variable varname does not exist.
     Returns:
         Nothing
     """
-    assert varname in globals(), f"Variable {varname} does not exist"
-    display(Eq(Symbol(varname), globals()[varname]))
+    if rhs == None:
+        caller_vars = inspect.currentframe().f_back.f_locals
+        assert varname in caller_vars, f"Variable {varname} does not exist"
+        rhs = caller_vars[varname]
+    display_equality(varname, rhs)
+    
