@@ -48,16 +48,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 
-version = "2023.1.0"
+version = "2024.1.0"
 
 dependencies = [
-    "sympy-plot-backends~=2.4",
+    "sympy-plot-backends>=2.4,<3",
     "sympy~=1.12", 
     "matplotlib==3.6.*", 
     "jupyter>=1.0.0", 
-    "numpy>=1.24",
+    "numpy>=1.26",
 ]
-requires-python = ">=3.8,<3.12"
+requires-python = ">=3.8"
 
 # generic information
 
@@ -80,6 +80,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Development Status :: 4 - Beta",
