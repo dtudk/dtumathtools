@@ -200,7 +200,7 @@ def l2_norm(v: MatrixBase) -> (Expr):
     return sqrt(sum(x**2 for x in v))
 
 
-def display_equality(lhs: str | Expr, rhs: str | Expr):
+def display_equality(lhs: Union[str, Expr], rhs: Union[str, Expr]):
     """Displays two sympy expressions or symbols separated by the equality symbol"
     Args:
         lhs: The left hand side of the equality.
