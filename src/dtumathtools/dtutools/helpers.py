@@ -221,13 +221,13 @@ def display_definition(varname: str, rhs: Optional[Expr] = None):
         varname: The name of the python variable to be displayed on the left hand side.
         rhs: An optional sympy Expr to be displayed on the right hand side instead of the actual variable definition.
     Raises:
-        Exception: Variable varname does not exist.
+        NameError: name 'varname' is not defined.
     Returns:
         Nothing
     """
     if rhs == None:
         caller_vars = inspect.currentframe().f_back.f_locals
-        assert varname in caller_vars, f"Variable {varname} does not exist"
+        if varname not in caller_vars:
+            raise NameError(f"name '{varname}' is not defined")
         rhs = caller_vars[varname]
     display_equality(varname, rhs)
-    
