@@ -126,6 +126,8 @@ def scatter(*args, **kwargs):
         Backend = kwargs.pop("backend", THREE_D_B)
         if Backend == BB:
             raise NotImplementedError("Bokeh does not support 3D scatter plots!")
+        if Backend == MAB:
+            warnings.warn(f"Mayavi is not currently supported by dtumathtools.")
         return plot3d_list(*args, is_point=True, backend=Backend, **kwargs)
 
 

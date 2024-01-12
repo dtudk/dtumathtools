@@ -10,6 +10,7 @@ test = 0
 del test
 
 # Disable mayavi tests for github actions, as this fails
+# Reactivate when support for mayavi should return for 4.8.2
 test_mab = False
 
 def test_quiver():

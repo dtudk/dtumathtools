@@ -214,6 +214,7 @@ def quiver(*args, **kwargs):
         elif Backend == KB:
             rendering_kw.setdefault("pivot", "tail")
         elif Backend == MAB:
+            warnings.warn(f"Mayavi is not currently supported by dtumathtools.")
             rendering_kw.setdefault("scale_factor", 1)
             rendering_kw.setdefault("resolution", 100)
             display_warning = kwargs.pop("warning", True)
