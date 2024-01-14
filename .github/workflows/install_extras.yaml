@@ -20,8 +20,8 @@ jobs:
           - bokeh
           - k3d
           - qt
-          - mayavi
           - test
+          # - mayavi # not currently supported
 
     steps:
       - uses: actions/checkout@v3
