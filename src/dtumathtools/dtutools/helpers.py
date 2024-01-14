@@ -5,6 +5,7 @@ from typing import Union, Optional, List
 import warnings
 from sympy.core import Symbol, Expr
 from sympy.matrices import MatrixBase
+import inspect
 
 
 def _extract_vars(expr: Expr) -> (List[Symbol]):
@@ -197,3 +198,36 @@ def l2_norm(v: MatrixBase) -> (Expr):
         Expr: The L2 norm of the matrix
     """
     return sqrt(sum(x**2 for x in v))
+
+
+def display_equality(lhs: Union[str, Expr], rhs: Union[str, Expr]):
+    """Displays two sympy expressions or symbols separated by the equality symbol"
+    Args:
+        lhs: The left hand side of the equality.
+        rhs: The right hand side of the equality.
+    Returns:
+        Nothing
+    """
+    if type(lhs) is str:
+        lhs =  Symbol(lhs)
+    if type(rhs) is str:
+        rhs =  Symbol(rhs)
+    display(Eq(lhs, rhs))
+
+
+def display_definition(varname: str, rhs: Optional[Expr] = None):
+    """Displays an expression stored in a python variable varname as "varname = expression ...."
+    Args:
+        varname: The name of the python variable to be displayed on the left hand side.
+        rhs: An optional sympy Expr to be displayed on the right hand side instead of the actual variable definition.
+    Raises:
+        NameError: name 'varname' is not defined.
+    Returns:
+        Nothing
+    """
+    if rhs == None:
+        caller_vars = inspect.currentframe().f_back.f_locals
+        if varname not in caller_vars:
+            raise NameError(f"name '{varname}' is not defined")
+        rhs = caller_vars[varname]
+    display_equality(varname, rhs)
