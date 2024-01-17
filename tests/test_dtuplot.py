@@ -52,6 +52,8 @@ def test_quiver():
     dtuplot.quiver(np.array([1, 2, 3]), Matrix([1, 2, 3]), backend=PB, show=False)
     dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), label="123", backend=PB, show=False)
     dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), label=["123"], backend=PB, show=False)
+    dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=PB, qlim=False, show=False)
+    dtuplot.quiver([1, 2], [4, 5], backend=PB, qlim=False, show=False)
     # bokeh
     dtuplot.quiver([1, 2], [4, 5], backend=BB, show=False)
     dtuplot.quiver(Matrix([1, 2]), Matrix([4, 5]), backend=BB, show=False)
@@ -60,6 +62,7 @@ def test_quiver():
     dtuplot.quiver(np.array([1, 2]), (1, 2), backend=BB, show=False)
     dtuplot.quiver(np.array([1, 2]), np.array([1, 2]), backend=BB, show=False)
     dtuplot.quiver(np.array([1, 2]), Matrix([1, 2]), backend=BB, show=False)
+    dtuplot.quiver([1, 2], [4, 5], backend=BB, qlim=False, show=False)
     # k3d
     with pytest.warns(
         UserWarning, match="K3DBackend only works properly within Jupyter Notebook"
@@ -76,6 +79,7 @@ def test_quiver():
         dtuplot.quiver(
             [1, 2, 3], Matrix([1, 2, 3]), label=["123"], backend=KB, show=False
         )
+        dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=KB, qlim=False, show=False)
     # mayavi
     if test_mab:
         # A lot of things in the Mayavi toolbox is deprecated...
@@ -120,6 +124,14 @@ def test_quiver():
                 backend=MAB,
                 show=False,
                 warning=False,
+            )
+            dtuplot.quiver(
+                [1, 2, 3],
+                [4, 5, 6],
+                backend=MAB,
+                qlim=False,
+                show=False,
+                warning=False
             )
 
         with pytest.raises(
