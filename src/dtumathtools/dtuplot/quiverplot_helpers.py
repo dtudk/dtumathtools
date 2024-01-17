@@ -30,8 +30,12 @@ def MB_update_quiver2d_helper(renderer, data, handle):
 
 
 class MBQuiver2DRenderer(MatplotlibRenderer):
-    _sal = True
     draw_update_map = {MB_draw_quiver2d_helper: MB_update_quiver2d_helper}
+    
+    def __init__(self, plot, s):
+        super().__init__(plot,s)
+        # set "_sal" based off series
+        self._sal = s._sal
 
 
 def MB_draw_quiver3d_helper(renderer, data):
@@ -51,8 +55,12 @@ def MB_update_quiver3d_helper(renderer, data, handle):
 
 
 class MBQuiver3DRenderer(MatplotlibRenderer):
-    _sal = True
     draw_update_map = {MB_draw_quiver3d_helper: MB_update_quiver3d_helper}
+    
+    def __init__(self, plot, s):
+        super().__init__(plot,s)
+        # set "_sal" based off series
+        self._sal = s._sal
 
 
 # Plotly
