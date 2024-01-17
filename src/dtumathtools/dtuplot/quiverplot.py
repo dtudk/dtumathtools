@@ -37,6 +37,8 @@ class ArrowSeries(VectorBase):
         self.use_quiver_solid_color = not self.use_cm
         # Line color needed for Mayavi
         self._line_color = kwargs.get("line_color", None)
+        # _sal argument saved here and passed to matplotlib backend (if used)
+        self._sal = kwargs.get("_sal", False)
 
     def __str__(self):
         # Overwrite the VectorBase __str__ as it assumes things
@@ -81,6 +83,7 @@ def quiver(*args, **kwargs):
         start (MatrixBase, np.ndarray, list, float): The starting coordinates (2D or 3D) of the vector. Can be given in multitude of ways/inputs.
         direction (MatrixBase, np.ndarray, list, float): The direction (2D or 3D) of the vector. Can be given in multitude of ways/inputs.
         rendering_kw (dict, optional): A dictionary forwarded to dtuplot.plot(), see SPB docs for reference.
+        qlim (bool, optional): Boolean relevant only for backend MB. If 'True' (default) adjusts xlim and ylim to the quiver.
         color (str, optional): A string to set the color of the vector with. With no argument color = 'blue'.
         show (bool, optional): Boolean, if 'True': show plot, other just return object without plotting. Defaults to 'True'.
 
@@ -176,6 +179,9 @@ def quiver(*args, **kwargs):
     # normalize argument needs to be passed to series object, but not to
     # backend. Otherwise warning will be raised. Thus pulled out here.
     normalize = kwargs.pop("normalize", False)
+    # automatically adjust the limits to the quiver. Only relevant for MB.
+    # saved in series, which propagates to the renderer when created.
+    qlim = kwargs.pop("qlim", True)
 
     # if 2D
     if point_args.shape[-1] == 2:
@@ -224,8 +230,15 @@ def quiver(*args, **kwargs):
                 )
 
     series = [
-        Series(start, stop, *otherargs, label=label, normalize=normalize, **kwargs)
-        for start, stop, label in zip(point_args[0, :, :], point_args[1, :, :], labels)
+        Series(
+            start,
+            stop,
+            *otherargs,
+            label=label,
+            normalize=normalize,
+            _sal=(qlim and Backend==MB), # save qlim kwarg in series object (if MB)
+            **kwargs,
+        ) for start, stop, label in zip(point_args[0, :, :], point_args[1, :, :], labels)
     ]
 
     _set_labels(series, labels, rendering_kw)

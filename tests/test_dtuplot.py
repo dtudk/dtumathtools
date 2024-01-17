@@ -34,6 +34,8 @@ def test_quiver():
     dtuplot.quiver(np.array([1, 2, 3]), Matrix([1, 2, 3]), backend=MB, show=False)
     dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), label="123", backend=MB, show=False)
     dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), label=["123"], backend=MB, show=False)
+    dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=MB, qlim=False, show=False)
+    dtuplot.quiver([1, 2], [4, 5], backend=MB, qlim=False, show=False)
     # plotly
     dtuplot.quiver(Matrix([1, 2, 3]), Matrix([4, 5, 6]), show=False, backend=PB)
     dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=PB, show=False)
