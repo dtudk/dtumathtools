@@ -1,10 +1,12 @@
 [project.optional-dependencies]
 
 
-## REMARK ##
-#----------#
-# when changing these details, remember to reflect
-# this in the conda-forge/dtumathtools-feedstock
+## REMARK WHEN CHANGING ##
+#------------------------#
+# Please also reflect these changes when new versions
+# are released through conda-forge/dtumathtools-feedstock
+# Secondly, please also change the requirements-all.txt
+# to install all optional dependencies.
 
 # TODO probably these should not be here:
 ipympl = ["ipympl>=0.7.0"]

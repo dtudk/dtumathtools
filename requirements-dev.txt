@@ -1,0 +1,1 @@
+.[ipympl,plotly,bokeh,k3d,qt,test,dev]
