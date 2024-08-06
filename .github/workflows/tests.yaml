@@ -13,11 +13,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8","3.9","3.10","3.11","3.12"]
+        python-version: ["3.9","3.10","3.11","3.12"]
         os: [ubuntu-latest, windows-latest, macos-latest]
-        exclude:
-          - python-version: "3.8"
-            os: "macos-latest"
 
     steps:
       - uses: actions/checkout@v4
@@ -30,10 +27,9 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
 
-      # removed mayavi till 4.8.2 comes out (not currently supported)
       - name: Install using flags
         run: |
-          python3 -m pip install -v .[ipympl,plotly,bokeh,k3d,qt,test]
+          python3 -m pip install -v .[ipympl,plotly,bokeh,k3d,mayavi,qt,test]
 
       - name: Test with pytest
         run: |

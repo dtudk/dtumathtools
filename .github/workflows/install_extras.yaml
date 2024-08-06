@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8","3.9","3.10","3.11","3.12"]
+        python-version: ["3.9","3.10","3.11","3.12"]
         os: [ubuntu-latest, windows-latest, macos-latest]
         extras:
           - ipympl
@@ -22,11 +22,7 @@ jobs:
           - k3d
           - qt
           - test
-          # - mayavi # not currently supported
-        exclude:
-          - python-version: "3.8"
-            os: "macos-latest"
-            extras: "k3d"
+          - mayavi
 
     steps:
       - uses: actions/checkout@v4
