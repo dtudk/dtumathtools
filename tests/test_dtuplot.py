@@ -11,7 +11,8 @@ del test
 
 # Disable mayavi tests for github actions, as this fails
 # Reactivate when support for mayavi should return for 4.8.2
-test_mab = False
+test_mab = True
+
 
 def test_quiver():
     # matplotlib
@@ -88,7 +89,11 @@ def test_quiver():
             # from mayavi import mlab  # used for the mayavi test to disable popups
             # mlab.options.offscreen = True
             dtuplot.quiver(
-                Matrix([1, 2, 3]), Matrix([4, 5, 6]), backend=MAB, show=False, warning=False
+                Matrix([1, 2, 3]),
+                Matrix([4, 5, 6]),
+                backend=MAB,
+                show=False,
+                warning=False,
             )
             dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=MAB, show=False, warning=False)
             dtuplot.quiver(1, 2, 0, 0, 0, 3, backend=MAB, show=False, warning=False)
@@ -126,16 +131,12 @@ def test_quiver():
                 warning=False,
             )
             dtuplot.quiver(
-                [1, 2, 3],
-                [4, 5, 6],
-                backend=MAB,
-                qlim=False,
-                show=False,
-                warning=False
+                [1, 2, 3], [4, 5, 6], backend=MAB, qlim=False, show=False, warning=False
             )
 
         with pytest.raises(
-            NotImplementedError, match="Mayavi backend does not support 2D vector plots!"
+            NotImplementedError,
+            match="Mayavi backend does not support 2D vector plots!",
         ):
             dtuplot.quiver([1, 2], [4, 5], backend=MAB, show=False, warning=False)
 
@@ -542,7 +543,11 @@ def test_scatterplot():
                 show=False,
             )
             dtuplot.scatter(
-                np.array([1, 2, 3]), Matrix([4, 5, 6]), [7, 8, 9], backend=MAB, show=False
+                np.array([1, 2, 3]),
+                Matrix([4, 5, 6]),
+                [7, 8, 9],
+                backend=MAB,
+                show=False,
             )
             dtuplot.scatter(Matrix([-1, 0, 1]), backend=MAB, show=False)
             dtuplot.scatter(Matrix([0, 0, 0]), backend=MAB, show=False)
@@ -553,7 +558,9 @@ def test_scatterplot():
             dtuplot.scatter([[1, 2, 3], [4, 5, 6]], backend=MAB, show=False)
             dtuplot.scatter([(1, 2, 3), [4, 5, 6]], backend=MAB, show=False)
             dtuplot.scatter([Matrix([1, 2, 3]), [4, 5, 6]], backend=MAB, show=False)
-            dtuplot.scatter([Matrix([1, 2, 3]), Matrix([4, 5, 6])], backend=MAB, show=False)
+            dtuplot.scatter(
+                [Matrix([1, 2, 3]), Matrix([4, 5, 6])], backend=MAB, show=False
+            )
             dtuplot.scatter([np.array([1, 2, 3]), [4, 5, 6]], backend=MAB, show=False)
             dtuplot.scatter(
                 [np.array([1, 2, 3]), np.array([4, 5, 6])], backend=MAB, show=False
@@ -633,3 +640,7 @@ def test_scatterplot():
         AssertionError, match="Length of all points in list must match!"
     ):
         dtuplot.scatter([[1, 2, 3], [1, 2]], backend=dtuplot.MB, show=False)
+
+
+if __name__ == "__main__":
+    test_quiver()

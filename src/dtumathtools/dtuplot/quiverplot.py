@@ -220,7 +220,6 @@ def quiver(*args, **kwargs):
         elif Backend == KB:
             rendering_kw.setdefault("pivot", "tail")
         elif Backend == MAB:
-            warnings.warn(f"Mayavi is not currently supported by dtumathtools.")
             rendering_kw.setdefault("scale_factor", 1)
             rendering_kw.setdefault("resolution", 100)
             display_warning = kwargs.pop("warning", True)
@@ -236,9 +235,10 @@ def quiver(*args, **kwargs):
             *otherargs,
             label=label,
             normalize=normalize,
-            _sal=(qlim and Backend==MB), # save qlim kwarg in series object (if MB)
+            _sal=(qlim and Backend == MB),  # save qlim kwarg in series object (if MB)
             **kwargs,
-        ) for start, stop, label in zip(point_args[0, :, :], point_args[1, :, :], labels)
+        )
+        for start, stop, label in zip(point_args[0, :, :], point_args[1, :, :], labels)
     ]
 
     _set_labels(series, labels, rendering_kw)
