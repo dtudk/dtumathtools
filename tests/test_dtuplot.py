@@ -643,7 +643,3 @@ def test_scatterplot():
         AssertionError, match="Length of all points in list must match!"
     ):
         dtuplot.scatter([[1, 2, 3], [1, 2]], backend=dtuplot.MB, show=False)
-
-
-if __name__ == "__main__":
-    test_quiver()
