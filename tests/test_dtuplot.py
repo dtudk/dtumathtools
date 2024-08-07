@@ -10,8 +10,11 @@ test = 0
 del test
 
 # Disable mayavi tests for github actions, as this fails
-# Reactivate when support for mayavi should return for 4.8.2
-test_mab = True
+# Updating mayavi to 4.8.2 has solved many problems for windows and
+# macos users, but requires additional packages for linux
+# before pytest works. Reactivate if mayavi is to be better supported
+# in the future...
+test_mab = False
 
 
 def test_quiver():
