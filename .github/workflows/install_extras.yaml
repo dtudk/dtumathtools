@@ -37,4 +37,4 @@ jobs:
 
       - name: Install using flags
         run: |
-          python3 -m pip install -v .[${{ matrix.extras }}]
+          python3 -m pip install -v --only-binary=:all: .[${{ matrix.extras }}]
