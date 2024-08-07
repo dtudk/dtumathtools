@@ -1,1 +1,1 @@
-.[ipympl,plotly,bokeh,k3d,qt,mayavi,test,dev]
+.[ipympl,plotly,bokeh,k3d,qt,test,dev]

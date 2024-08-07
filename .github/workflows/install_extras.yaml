@@ -22,7 +22,7 @@ jobs:
           - k3d
           - qt
           - test
-          - mayavi
+          # - mayavi # No wheel for 4.8.2, so does not work with --only-binary
 
     steps:
       - uses: actions/checkout@v4
