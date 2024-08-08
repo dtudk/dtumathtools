@@ -1,6 +1,6 @@
 from spb import MB, PB, BB, KB, MAB
 from spb.defaults import THREE_D_B, TWO_D_B
-from spb.functions import _set_labels
+from spb.plot_functions.functions_2d import _set_labels
 from spb.series import VectorBase
 from spb.utils import _instantiate_backend
 from sympy import Matrix, latex, symbols

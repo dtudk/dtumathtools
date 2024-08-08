@@ -1,6 +1,6 @@
 from sympy import MatrixBase, Expr, Basic, MutableMatrix, ImmutableMatrix
 from sympy.external import import_module
-from spb.functions import plot_list, plot3d_list
+from spb import plot_list, plot3d_list
 from spb.backends.base_backend import Plot
 import numpy as np
 from spb import MB, PB, BB, KB, MAB
