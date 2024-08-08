@@ -21,13 +21,15 @@ k3d = [
     "k3d>=2.9.7",
 ]
 qt = ["PyQt5~=5.15.9"]
-mayavi = [
-    "PyQt5~=5.15.9",
-    "vtk",
-    "ipyevents",
-    "mayavi==4.8.2",
-    "configobj",
-]
+# # Mayavi is not currently supported
+# # The following list is the known requirements
+# mayavi = [
+#     "PyQt5~=5.15.9",
+#     "vtk",
+#     "ipyevents",
+#     "mayavi==4.8.2",
+#     "configobj",
+# ]
 
 
 # Customary, the test is for ci-builds
