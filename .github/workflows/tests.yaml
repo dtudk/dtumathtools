@@ -5,6 +5,8 @@ on:
     branches: [ "main", "b*" ]
   pull_request:
     branches: [ "main", "b*" ]
+  schedule:
+    - cron: "0 16 * * 4" # Every Thursday at 16 UTC (17 CET/18 CEST)
 
 jobs:
   build:
