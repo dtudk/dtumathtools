@@ -56,7 +56,8 @@ build-backend = "setuptools.build_meta"
 version = "2024.2.0"
 
 dependencies = [
-    "sympy-plot-backends>=3.1.1,<3.3",
+    'sympy-plot-backends>=3.1.1,<3.3;python_version<="3.9"',
+    'sympy-plot-backends>=3.4,<4.0;python_version>="3.10"',
     "sympy~=1.12", 
     "matplotlib==3.9.*", 
     "jupyter>=1.0.0", 
