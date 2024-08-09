@@ -1,78 +1,92 @@
-# Following are the helper functions such that data can be read
-# and passed on correctly for all backends
-
-# Matplotlib
-from spb.backends.matplotlib.renderers.vector2d import (
-    _draw_vector2d_helper as MB_draw_vector2d_helper,
-    _update_vector2d_helper as MB_update_vector2d_helper,
-)
-from spb.backends.matplotlib.renderers.vector3d import (
-    _draw_vector3d_helper as MB_draw_vector3d_helper,
-    _update_vector3d_helper as MB_update_vector3d_helper,
-)
-from spb.backends.matplotlib.renderers.renderer import MatplotlibRenderer
-
-
-def MB_draw_quiver2d_helper(renderer, data):
-    start, end = data.T
-    direction = end - start
-    xx, yy = start
-    uu, vv = direction
-    return MB_draw_vector2d_helper(renderer, (xx, yy, uu, vv))
-
-
-def MB_update_quiver2d_helper(renderer, data, handle):
-    start, end = data.T
-    direction = end - start
-    xx, yy = start
-    uu, vv = direction
-    return MB_update_vector2d_helper(renderer, (xx, yy, uu, vv), handle)
-
-
-class MBQuiver2DRenderer(MatplotlibRenderer):
-    draw_update_map = {MB_draw_quiver2d_helper: MB_update_quiver2d_helper}
-    
-    def __init__(self, plot, s):
-        super().__init__(plot,s)
-        # set "_sal" based off series
-        self._sal = s._sal
-
-
-def MB_draw_quiver3d_helper(renderer, data):
-    start, end = data.T
-    direction = end - start
-    xx, yy, zz = start
-    uu, vv, ww = direction
-    return MB_draw_vector3d_helper(renderer, (xx, yy, zz, uu, vv, ww))
-
-
-def MB_update_quiver3d_helper(renderer, data, handle):
-    start, end = data.T
-    direction = end - start
-    xx, yy, zz = start
-    uu, vv, ww = direction
-    return MB_update_vector3d_helper(renderer, (xx, yy, zz, uu, vv, ww), handle)
-
-
-class MBQuiver3DRenderer(MatplotlibRenderer):
-    draw_update_map = {MB_draw_quiver3d_helper: MB_update_quiver3d_helper}
-    
-    def __init__(self, plot, s):
-        super().__init__(plot,s)
-        # set "_sal" based off series
-        self._sal = s._sal
-
+# Have not been happy with how quivers are handled in plotly.
+# This code works around the limitations using the (very nice)
+# vector plotting functionality of plotly (instead of the arrow).
 
 # Plotly
+from spb.backends.base_renderer import Renderer
 from spb.backends.plotly.renderers.vector2d import (
     _draw_vector2d_helper as PB_draw_vector2d_helper,
+)
+from spb.backends.plotly.renderers.vector2d import (
     _update_vector2d_helper as PB_update_vector2d_helper,
 )
 from spb.backends.plotly.renderers.vector3d import (
     _draw_vector3d_helper as PB_draw_vector3d_helper,
+)
+from spb.backends.plotly.renderers.vector3d import (
     _update_vector3d_helper as PB_update_vector3d_helper,
 )
-from spb.backends.base_renderer import Renderer
+from spb.series import VectorBase
+from sympy import latex
+from sympy.external import import_module
+
+np = import_module("numpy")
+
+class ArrowSeries(VectorBase):
+    """Represent a vector field."""
+
+    is_vector = True
+    is_slice = False
+    is_streamlines = False
+    _allowed_keys = []
+
+    def __init__(self, start, direction, label=None, **kwargs):
+        # Ranges must be given for VectorBase, even though they are None
+        super().__init__(
+            [start, direction], ranges=start.shape[-1] * [None], label=label, **kwargs
+        )
+
+        self.start = start
+        self.direction = direction
+
+        self._label = f"{start}->{direction}" if label is None else label
+        self._latex_label = latex(f"{start}->{direction}") if label is None else label
+
+        # Standard for 'use_cm' should be False
+        self.use_cm = kwargs.get("use_cm", False)
+        # Linked colormap using vector2d renderer
+        self.use_quiver_solid_color = not self.use_cm
+        # Line color needed for Mayavi
+        self._line_color = kwargs.get("line_color", None)
+        # _sal argument saved here and passed to matplotlib backend (if used)
+        self._sal = kwargs.get("_sal", False)
+
+    def __str__(self):
+        # Overwrite the VectorBase __str__ as it assumes things
+        # about variables that does not hold for this class.
+        return self._str_helper(
+            f"Arrow Series with start point {self.start}, and direction {self.direction}"
+        )
+
+    def get_data(self):
+        # This format works for both MB and PB
+        # Has to translate to start/end and transpose
+        # such that the x,y,z lims match the arrow
+        # compensation for this in arrow done in
+        # quiverplot_helpers.
+        start = np.array(self.start)
+        end = start + np.array(self.direction)
+        return np.array(
+            [start, end]
+        ).T  # [np.array([v]) for v in list(self.start) + list(self.direction)]
+
+
+# Specify 2D class such that this can be linked with renderer
+class Arrow2DSeries(ArrowSeries):
+    is_2Dvector = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+# Specify 3D class such that this can be linked with renderer
+class Arrow3DSeries(ArrowSeries):
+    is_3Dvector = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
 
 
 def PB_draw_quiver2d_helper(renderer, data):
@@ -114,83 +128,3 @@ def PB_update_quiver3d_helper(renderer, data, handle):
 class PBQuiver3DRenderer(Renderer):
     draw_update_map = {PB_draw_quiver3d_helper: PB_update_quiver3d_helper}
 
-
-# Bokeh
-from spb.backends.bokeh.renderers.vector2d import (
-    _draw_vector2d_helper as BB_draw_vector2d_helper,
-    _update_vector2d_helper as BB_update_vector2d_helper,
-)
-
-
-def BB_draw_quiver2d_helper(renderer, data):
-    start, end = data.T
-    direction = end - start
-    xx, yy = start
-    uu, vv = direction
-    return BB_draw_vector2d_helper(renderer, (xx, yy, uu, vv))
-
-
-def BB_update_quiver2d_helper(renderer, data, handle):
-    start, end = data.T
-    direction = end - start
-    xx, yy = start
-    uu, vv = direction
-    return BB_update_vector2d_helper(renderer, (xx, yy, uu, vv), handle)
-
-
-class BBQuiver2DRenderer(Renderer):
-    draw_update_map = {BB_draw_quiver2d_helper: BB_update_quiver2d_helper}
-
-
-# K3D
-from spb.backends.k3d.renderers.vector3d import (
-    _draw_vector3d_helper as KB_draw_vector3d_helper,
-    _update_vector3d_helper as KB_update_vector3d_helper,
-)
-
-
-def KB_draw_quiver3d_helper(renderer, data):
-    start, end = data.T
-    direction = end - start
-    xx, yy, zz = start
-    uu, vv, ww = direction
-    return KB_draw_vector3d_helper(renderer, (xx, yy, zz, uu, vv, ww))
-
-
-def KB_update_quiver3d_helper(renderer, data, handle):
-    start, end = data.T
-    direction = end - start
-    xx, yy, zz = start
-    uu, vv, ww = direction
-    return KB_update_vector3d_helper(renderer, (xx, yy, zz, uu, vv, ww), handle)
-
-
-class KBQuiver3DRenderer(Renderer):
-    draw_update_map = {KB_draw_quiver3d_helper: KB_update_quiver3d_helper}
-
-
-# Mayavi
-from spb.backends.mayavi.renderers.vector3d import (
-    _draw_vector3d_helper as MAB_draw_vector3d_helper,
-    _update_vector3d_helper as MAB_update_vector3d_helper,
-)
-
-
-def MAB_draw_quiver3d_helper(renderer, data):
-    start, end = data.T
-    direction = end - start
-    xx, yy, zz = start
-    uu, vv, ww = direction
-    return MAB_draw_vector3d_helper(renderer, (xx, yy, zz, uu, vv, ww))
-
-
-def MAB_update_quiver3d_helper(renderer, data, handle):
-    start, end = data.T
-    direction = end - start
-    xx, yy, zz = start
-    uu, vv, ww = direction
-    return MAB_update_vector3d_helper(renderer, (xx, yy, zz, uu, vv, ww), handle)
-
-
-class MABQuiver3DRenderer(Renderer):
-    draw_update_map = {MAB_draw_quiver3d_helper: MAB_update_quiver3d_helper}

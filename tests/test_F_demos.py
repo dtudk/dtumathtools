@@ -202,7 +202,9 @@ def test_week1():
             a0, rendering_kw={"alpha": 1, "s": 100, "color": "black"}, show=False
         )
     )
-    p.extend(dtuplot.quiver(a0, N, {"color": "red"}, show=False))
+    # Added qlim argument here to avoid warning. However, this does not
+    # affect the demos, as this is not in the demos (currently)
+    p.extend(dtuplot.quiver(a0, N, {"color": "red"}, show=False,qlim=False))
 
     x, y, u = symbols("x y u")
     f = x**2 / 10 + y**2 / 10 + 10
@@ -234,6 +236,8 @@ def test_week1():
             r1[0], r1[1], 0, rendering_kw={"color": "black", "s": 100}, show=False
         )
     )
+    # Added qlim argument here to avoid warning. However, this does not
+    # affect the demos, as this is not in the demos (currently)
     p.extend(
         dtuplot.quiver(
             r1[0],
@@ -244,6 +248,7 @@ def test_week1():
             f.subs({x: r1[0], y: r1[1]}),
             rendering_kw={"color": "orange"},
             show=False,
+            qlim=False,
         )
     )
     r2 = r.subs(u, 3 * pi / 2)
@@ -262,6 +267,7 @@ def test_week1():
             f.subs({x: r2[0], y: r2[1]}),
             rendering_kw={"color": "orange"},
             show=False,
+            qlim=False,
         )
     )
 
@@ -377,12 +383,15 @@ def test_week1():
         rendering_kw={"alpha": 0.35, "color": "blue"},
         show=False,
     )
-    p_normalvector = dtuplot.quiver(p0, n4, rendering_kw={"color": "red"}, show=False)
+    # Added qlim argument here to avoid warning. However, this does not
+    # affect the demos, as this is not in the demos (currently)
+    p_normalvector = dtuplot.quiver(p0, n4, rendering_kw={"color": "red"}, show=False,qlim=False)
     p_arrow_along_plane = dtuplot.quiver(
         p0,
         [e[0], e[1], f.subs({x: 1, y: -1})],
         rendering_kw={"color": "orange"},
         show=False,
+        qlim=False,
     )
     res = p_parab + p_point + p_vertical_plane + p_normalvector + p_arrow_along_plane
 
@@ -1148,11 +1157,14 @@ def test_week6():
         use_cm=False,
         rendering_kw={"color": "grey", "linestyle": "dashed"},
     )
+    # Added qlim argument here to avoid warning. However, this does not
+    # affect the demos, as this is not in the demos (currently)
     pil3d = dtuplot.quiver(
         Matrix([0.3, 0.375, 0]),
         Matrix([0, 0, 0.375]),
         show=False,
         rendering_kw={"color": "black"},
+        qlim=False,
     )
 
     with pytest.warns(
@@ -1634,8 +1646,10 @@ def test_week9():
     res = p_kurve + p_flade + p_felt_rot
     N = r.diff(u).cross(r.diff(v))
     assert simplify(N) == Matrix([0, -u, u])
-    p_normalvektor = dtuplot.quiver(s.subs(u, 0), N.subs({u: 1, v: 0}), show=False)
-    p_omloebs = dtuplot.quiver(s.subs(u, 0), ds.subs(u, 0), show=False)
+    # Added qlim argument here to avoid warning. However, this does not
+    # affect the demos, as this is not in the demos (currently)
+    p_normalvektor = dtuplot.quiver(s.subs(u, 0), N.subs({u: 1, v: 0}), show=False, qlim=False)
+    p_omloebs = dtuplot.quiver(s.subs(u, 0), ds.subs(u, 0), show=False, qlim=False)
     p_kurve.camera = {"elev": 5, "azim": -35}
     res = p_kurve + p_flade + p_normalvektor + p_omloebs
     integrand = N.dot(dtutools.rot(V, var=[x, y, z]))
@@ -1670,11 +1684,14 @@ def test_week9():
     # sikrer os at vi gennemløber randen i den rigtige retning
     N = r.diff(u).cross(r.diff(v))
     # vektor dobbelt så lang, så den kan ses fra denne vinkel
+    # Added qlim argument here to avoid warning. However, this does not
+    # affect the demos, as this is not in the demos (currently)
     p_normalvektor = dtuplot.quiver(
         r.subs({u: 0, v: -pi / 4}),
         2 * N.subs({u: 0, v: -pi / 4}),
         {"color": "black"},
         show=False,
+        qlim=False
     )
     combined_flade = p_flade + p_felt_flade + p_normalvektor
     combined_flade.title = "Fladen og feltet"
@@ -1744,11 +1761,15 @@ def test_week9():
     )
     # for hver af de 4 felter vil vi også gerne have retningen af deres afledte
     # dette skal bruges til at bestemme hvilken retning vi skal omløbe linjerne i
+    
+    # Added qlim argument here to avoid warning. However, this does not
+    # affect the demos, as this is not in the demos (currently)
     p_omloebs = dtuplot.quiver(
         s1.subs({u: -pi / 2, v: -pi}),
         ds1.subs({u: -pi / 2, v: -pi}),
         {"color": "red"},
         show=False,
+        qlim=False,
     )
     p_omloebs.extend(
         dtuplot.quiver(
@@ -1756,6 +1777,7 @@ def test_week9():
             ds2.subs({u: -pi / 2, v: -pi}),
             {"color": "green"},
             show=False,
+            qlim=False,
         )
     )
     p_omloebs.extend(
@@ -1764,6 +1786,7 @@ def test_week9():
             ds3.subs({u: -pi / 2, v: -pi}),
             {"color": "blue"},
             show=False,
+            qlim=False,
         )
     )
     p_omloebs.extend(
@@ -1772,6 +1795,7 @@ def test_week9():
             ds4.subs({u: -pi / 2, v: -pi}),
             {"color": "purple"},
             show=False,
+            qlim=False,
         )
     )
     combined_rand = p_rand + p_flade_mesh + p_felt + p_omloebs

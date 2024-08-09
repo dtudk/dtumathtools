@@ -20,25 +20,25 @@ test_mab = False
 def test_quiver():
     # matplotlib
     dtuplot.quiver(
-        Matrix([1, 2, 3]), Matrix([4, 5, 6]), {"color": "red"}, backend=MB, show=False
+        Matrix([1, 2, 3]), Matrix([4, 5, 6]), {"color": "red"}, backend=MB, show=False, qlim=True,
     )
-    dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=MB, show=False)
+    dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=MB, show=False, qlim=True)
     dtuplot.quiver([1, 2], [4, 5], backend=MB, show=False)
     dtuplot.quiver(Matrix([1, 2]), Matrix([4, 5]), backend=MB, show=False)
     dtuplot.quiver(
-        1, 2, 0, 0, 0, 3, rendering_kw={"color": "orange"}, backend=MB, show=False
+        1, 2, 0, 0, 0, 3, rendering_kw={"color": "orange"}, backend=MB, show=False, xlim=[0,10], ylim=[-5,5], zlim=[-5,5],
     )
     dtuplot.quiver(1, 2, 1, 2, backend=MB, show=False)
     dtuplot.quiver((1, 2), (1, 2), backend=MB, show=False)
     dtuplot.quiver(np.array([1, 2]), (1, 2), backend=MB, show=False)
     dtuplot.quiver(np.array([1, 2]), np.array([1, 2]), backend=MB, show=False)
     dtuplot.quiver(np.array([1, 2]), Matrix([1, 2]), backend=MB, show=False)
-    dtuplot.quiver(np.array([1, 2, 3]), (1, 2, 3), backend=MB, show=False)
-    dtuplot.quiver(np.array([1, 2, 3]), np.array([1, 2, 3]), backend=MB, show=False)
-    dtuplot.quiver(np.array([1, 2, 3]), Matrix([1, 2, 3]), backend=MB, show=False)
-    dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), label="123", backend=MB, show=False)
-    dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), label=["123"], backend=MB, show=False)
-    dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=MB, qlim=False, show=False)
+    dtuplot.quiver(np.array([1, 2, 3]), (1, 2, 3), backend=MB, show=False, qlim=True)
+    dtuplot.quiver(np.array([1, 2, 3]), np.array([1, 2, 3]), backend=MB, show=False, qlim=True)
+    dtuplot.quiver(np.array([1, 2, 3]), Matrix([1, 2, 3]), backend=MB, show=False, qlim=True)
+    dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), label="123", backend=MB, show=False, qlim=True)
+    dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), label=["123"], backend=MB, show=False, qlim=True)
+    dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=MB, qlim=False, show=False, xlim=[0,10], ylim=[-5,5], zlim=[-5,5])
     dtuplot.quiver([1, 2], [4, 5], backend=MB, qlim=False, show=False)
     # plotly
     dtuplot.quiver(Matrix([1, 2, 3]), Matrix([4, 5, 6]), show=False, backend=PB)
@@ -230,6 +230,12 @@ def test_quiver():
         NotImplementedError, match="Interactive quiver plots are not yet implemented!"
     ):
         dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), params=123, backend=MB, show=False)
+    
+    with pytest.warns(
+            UserWarning,
+            match="Warning: Limits were not given for a 3D quiver using Matplotlib. ",
+        ):
+        dtuplot.quiver([1, 2, 3], [1, 2, 3], backend=MB, show=False)
 
 
 def test_boundary():
