@@ -23,6 +23,10 @@ jobs:
           - qt
           - test
           # - mayavi # not currently supported
+        exclude:
+          - python-version: "3.8"
+            os: "macos-latest"
+            extras: "k3d"
 
     steps:
       - uses: actions/checkout@v4
