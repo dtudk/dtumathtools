@@ -30,7 +30,11 @@ jobs:
       # removed mayavi till 4.8.2 comes out (not currently supported)
       - name: Install using flags
         run: |
-          python3 -m pip install -v .[ipympl,plotly,bokeh,k3d,qt,test]
+          if [[ "${{ matrix.python-version }}" == "3.8" ]]; then
+            python3 -m pip install -v .[ipympl,plotly,bokeh,qt,test]
+          else
+            python3 -m pip install -v .[ipympl,plotly,bokeh,k3d,qt,test]
+          fi
 
       - name: Test with pytest
         run: |
