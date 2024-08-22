@@ -2,9 +2,9 @@ name: Linting code
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main", "b*" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main", "b*" ]
 
 jobs:
   build:
@@ -18,9 +18,13 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Upgrade pip
+        run: |
+          python3 -m pip install --upgrade pip
+
       - name: Install using flags
         run: |
-          pip install .[dev]
+          python3 -m pip install -v .[dev]
 
       - name: Lint with flake8
         run: |
