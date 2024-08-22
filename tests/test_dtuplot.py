@@ -10,31 +10,35 @@ test = 0
 del test
 
 # Disable mayavi tests for github actions, as this fails
-# Reactivate when support for mayavi should return for 4.8.2
+# Updating mayavi to 4.8.2 has solved many problems for windows and
+# macos users, but requires additional packages for linux
+# before pytest works. Reactivate if mayavi is to be better supported
+# in the future...
 test_mab = False
+
 
 def test_quiver():
     # matplotlib
     dtuplot.quiver(
-        Matrix([1, 2, 3]), Matrix([4, 5, 6]), {"color": "red"}, backend=MB, show=False
+        Matrix([1, 2, 3]), Matrix([4, 5, 6]), {"color": "red"}, backend=MB, show=False, qlim=True,
     )
-    dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=MB, show=False)
+    dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=MB, show=False, qlim=True)
     dtuplot.quiver([1, 2], [4, 5], backend=MB, show=False)
     dtuplot.quiver(Matrix([1, 2]), Matrix([4, 5]), backend=MB, show=False)
     dtuplot.quiver(
-        1, 2, 0, 0, 0, 3, rendering_kw={"color": "orange"}, backend=MB, show=False
+        1, 2, 0, 0, 0, 3, rendering_kw={"color": "orange"}, backend=MB, show=False, xlim=[0,10], ylim=[-5,5], zlim=[-5,5],
     )
     dtuplot.quiver(1, 2, 1, 2, backend=MB, show=False)
     dtuplot.quiver((1, 2), (1, 2), backend=MB, show=False)
     dtuplot.quiver(np.array([1, 2]), (1, 2), backend=MB, show=False)
     dtuplot.quiver(np.array([1, 2]), np.array([1, 2]), backend=MB, show=False)
     dtuplot.quiver(np.array([1, 2]), Matrix([1, 2]), backend=MB, show=False)
-    dtuplot.quiver(np.array([1, 2, 3]), (1, 2, 3), backend=MB, show=False)
-    dtuplot.quiver(np.array([1, 2, 3]), np.array([1, 2, 3]), backend=MB, show=False)
-    dtuplot.quiver(np.array([1, 2, 3]), Matrix([1, 2, 3]), backend=MB, show=False)
-    dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), label="123", backend=MB, show=False)
-    dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), label=["123"], backend=MB, show=False)
-    dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=MB, qlim=False, show=False)
+    dtuplot.quiver(np.array([1, 2, 3]), (1, 2, 3), backend=MB, show=False, qlim=True)
+    dtuplot.quiver(np.array([1, 2, 3]), np.array([1, 2, 3]), backend=MB, show=False, qlim=True)
+    dtuplot.quiver(np.array([1, 2, 3]), Matrix([1, 2, 3]), backend=MB, show=False, qlim=True)
+    dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), label="123", backend=MB, show=False, qlim=True)
+    dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), label=["123"], backend=MB, show=False, qlim=True)
+    dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=MB, qlim=False, show=False, xlim=[0,10], ylim=[-5,5], zlim=[-5,5])
     dtuplot.quiver([1, 2], [4, 5], backend=MB, qlim=False, show=False)
     # plotly
     dtuplot.quiver(Matrix([1, 2, 3]), Matrix([4, 5, 6]), show=False, backend=PB)
@@ -88,7 +92,11 @@ def test_quiver():
             # from mayavi import mlab  # used for the mayavi test to disable popups
             # mlab.options.offscreen = True
             dtuplot.quiver(
-                Matrix([1, 2, 3]), Matrix([4, 5, 6]), backend=MAB, show=False, warning=False
+                Matrix([1, 2, 3]),
+                Matrix([4, 5, 6]),
+                backend=MAB,
+                show=False,
+                warning=False,
             )
             dtuplot.quiver([1, 2, 3], [4, 5, 6], backend=MAB, show=False, warning=False)
             dtuplot.quiver(1, 2, 0, 0, 0, 3, backend=MAB, show=False, warning=False)
@@ -126,16 +134,12 @@ def test_quiver():
                 warning=False,
             )
             dtuplot.quiver(
-                [1, 2, 3],
-                [4, 5, 6],
-                backend=MAB,
-                qlim=False,
-                show=False,
-                warning=False
+                [1, 2, 3], [4, 5, 6], backend=MAB, qlim=False, show=False, warning=False
             )
 
         with pytest.raises(
-            NotImplementedError, match="Mayavi backend does not support 2D vector plots!"
+            NotImplementedError,
+            match="Mayavi backend does not support 2D vector plots!",
         ):
             dtuplot.quiver([1, 2], [4, 5], backend=MAB, show=False, warning=False)
 
@@ -226,6 +230,12 @@ def test_quiver():
         NotImplementedError, match="Interactive quiver plots are not yet implemented!"
     ):
         dtuplot.quiver([1, 2, 3], Matrix([1, 2, 3]), params=123, backend=MB, show=False)
+    
+    with pytest.warns(
+            UserWarning,
+            match="Warning: Limits were not given for a 3D quiver using Matplotlib. ",
+        ):
+        dtuplot.quiver([1, 2, 3], [1, 2, 3], backend=MB, show=False)
 
 
 def test_boundary():
@@ -542,7 +552,11 @@ def test_scatterplot():
                 show=False,
             )
             dtuplot.scatter(
-                np.array([1, 2, 3]), Matrix([4, 5, 6]), [7, 8, 9], backend=MAB, show=False
+                np.array([1, 2, 3]),
+                Matrix([4, 5, 6]),
+                [7, 8, 9],
+                backend=MAB,
+                show=False,
             )
             dtuplot.scatter(Matrix([-1, 0, 1]), backend=MAB, show=False)
             dtuplot.scatter(Matrix([0, 0, 0]), backend=MAB, show=False)
@@ -553,7 +567,9 @@ def test_scatterplot():
             dtuplot.scatter([[1, 2, 3], [4, 5, 6]], backend=MAB, show=False)
             dtuplot.scatter([(1, 2, 3), [4, 5, 6]], backend=MAB, show=False)
             dtuplot.scatter([Matrix([1, 2, 3]), [4, 5, 6]], backend=MAB, show=False)
-            dtuplot.scatter([Matrix([1, 2, 3]), Matrix([4, 5, 6])], backend=MAB, show=False)
+            dtuplot.scatter(
+                [Matrix([1, 2, 3]), Matrix([4, 5, 6])], backend=MAB, show=False
+            )
             dtuplot.scatter([np.array([1, 2, 3]), [4, 5, 6]], backend=MAB, show=False)
             dtuplot.scatter(
                 [np.array([1, 2, 3]), np.array([4, 5, 6])], backend=MAB, show=False

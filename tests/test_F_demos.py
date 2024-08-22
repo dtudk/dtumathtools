@@ -28,6 +28,18 @@ def test_week1():
 
     f = 4 - x**2 - y**2
     p = dtuplot.plot3d(f, (x, -3, 3), (y, -3, 3), show=False)
+    p = dtuplot.plot3d(
+        f, (x, -3, 3), (y, -3, 3), camera={"elev": 25, "azim": 45}, show=False
+    )
+    p = dtuplot.plot3d(
+        f,
+        (x, -3, 3),
+        (y, -3, 3),
+        wireframe=True,
+        rendering_kw={"color": "red", "alpha": 0.5},
+        show=False,
+    )
+    p = dtuplot.plot3d(f, (x, -3, 3), (y, -3, 3), use_cm=True, legend=True, show=False)
 
     dtuplot.plot_contour(f, (x, -3, 3), (y, -3, 3), is_filled=False, show=False)
 
@@ -44,6 +56,15 @@ def test_week1():
     p = dtuplot.plot3d(f, (x, -3, 3), (y, -3, 3), use_cm=True, legend=True, show=False)
 
     f = cos(x) + sin(y)
+    p = dtuplot.plot3d(
+        f,
+        (x, -pi / 2, 3 / 2 * pi),
+        (y, 0, 2 * pi),
+        use_cm=True,
+        camera={"elev": 45, "azim": -65},
+        legend=True,
+        show=False,
+    )
     nf = Matrix([f.diff(x), f.diff(y)])
 
     dtuplot.plot_vector(
@@ -181,7 +202,9 @@ def test_week1():
             a0, rendering_kw={"alpha": 1, "s": 100, "color": "black"}, show=False
         )
     )
-    p.extend(dtuplot.quiver(a0, N, {"color": "red"}, show=False))
+    # Added qlim argument here to avoid warning. However, this does not
+    # affect the demos, as this is not in the demos (currently)
+    p.extend(dtuplot.quiver(a0, N, {"color": "red"}, show=False,qlim=False))
 
     x, y, u = symbols("x y u")
     f = x**2 / 10 + y**2 / 10 + 10
@@ -213,6 +236,8 @@ def test_week1():
             r1[0], r1[1], 0, rendering_kw={"color": "black", "s": 100}, show=False
         )
     )
+    # Added qlim argument here to avoid warning. However, this does not
+    # affect the demos, as this is not in the demos (currently)
     p.extend(
         dtuplot.quiver(
             r1[0],
@@ -223,6 +248,7 @@ def test_week1():
             f.subs({x: r1[0], y: r1[1]}),
             rendering_kw={"color": "orange"},
             show=False,
+            qlim=False,
         )
     )
     r2 = r.subs(u, 3 * pi / 2)
@@ -241,6 +267,7 @@ def test_week1():
             f.subs({x: r2[0], y: r2[1]}),
             rendering_kw={"color": "orange"},
             show=False,
+            qlim=False,
         )
     )
 
@@ -356,12 +383,15 @@ def test_week1():
         rendering_kw={"alpha": 0.35, "color": "blue"},
         show=False,
     )
-    p_normalvector = dtuplot.quiver(p0, n4, rendering_kw={"color": "red"}, show=False)
+    # Added qlim argument here to avoid warning. However, this does not
+    # affect the demos, as this is not in the demos (currently)
+    p_normalvector = dtuplot.quiver(p0, n4, rendering_kw={"color": "red"}, show=False,qlim=False)
     p_arrow_along_plane = dtuplot.quiver(
         p0,
         [e[0], e[1], f.subs({x: 1, y: -1})],
         rendering_kw={"color": "orange"},
         show=False,
+        qlim=False,
     )
     res = p_parab + p_point + p_vertical_plane + p_normalvector + p_arrow_along_plane
 
@@ -429,16 +459,7 @@ def test_week2():
     P6_p2 = P6.subs([(x, 1 / 2), (y, 1 / 2)])
     res = f_p2 - P1_p2, f_p2 - P2_p2, f_p2 - P6_p2
     z = symbols("z")
-    f = (
-        7 * x**2
-        - 4 * x * y
-        + 6 * y**2
-        - 4 * y * z
-        + 5 * z**2
-        - 2 * x
-        + 20 * y
-        - 10 * z
-    )
+    f = 7 * x**2 - 4 * x * y + 6 * y**2 - 4 * y * z + 5 * z**2 - 2 * x + 20 * y - 10 * z
     H = dtutools.hessian(f)
     var_vec = Matrix([x, y, z])
     A = S(1) / 2 * H
@@ -529,6 +550,7 @@ def test_week3():
     assert (0, 2) in sols
     assert (2, 0) in sols
     assert (2, 2) in sols
+    H = dtutools.hessian(f)
     fxx = f.diff(x, 2)
     fxy = f.diff(x, y)
     fyy = f.diff(y, 2)
@@ -544,16 +566,17 @@ def test_week3():
         (x, -0.8, 2.8),
         (y, -0.8, 2.8),
         use_cm=True,
+        colorbar=False,
         show=False,
         wireframe=True,
         rendering_kw={"alpha": 0.6},
     )
-    # Following command changed, as the scatter function changed. 
+    # Following command changed, as the scatter function changed.
     # Each point is now given in a list, so '*' is removed.
     points = dtuplot.scatter(
         [Matrix([x0, y0, f.subs([(x, x0), (y, y0)])]) for (x0, y0) in sols],
         show=False,
-        rendering_kw={"s": 100, "color": "red"}
+        rendering_kw={"s": 100, "color": "red"},
     )
     pf.camera = {"azim": -50, "elev": 30}
     pf.extend(points)
@@ -587,12 +610,13 @@ def test_week3():
         show=False,
         rendering_kw={"alpha": 0.5},
     )
-    # Following command changed, as the scatter function changed. 
+    pf.camera = {"azim": -161, "elev": 5}
+    # Following command changed, as the scatter function changed.
     # Each point is now given in a list, so '*' is removed.
     points = dtuplot.scatter(
         [Matrix([x0, y0, f.subs([(x, x0), (y, y0)])]) for x0, y0 in stat_punkter],
         show=False,
-        rendering_kw={"color": "red", "s": 30}
+        rendering_kw={"color": "red", "s": 30},
     )
     pf.camera = {"azim": -161, "elev": -5}
     res = pf + points
@@ -625,9 +649,16 @@ def test_week3():
     lign2 = Eq(f.diff(y), 0)
     sols = nonlinsolve([lign1, lign2], [x, y])
     assert (S(1) / 2, 0) in sols
-    dtuplot.plot(f.subs(y, -1), (x, 0, 2), show=False)
-    dtuplot.plot(f.subs(y, 1 - x), (x, 0, 2), show=False)
-    dtuplot.plot(f.subs(x, 0), (y, -1, 1), ylim=(0, 3), aspect="equal", show=False)
+    dtuplot.plot(f.subs(y, -1), (x, 0, 2), title="Randlinjen f(x, -1)", show=False)
+    dtuplot.plot(f.subs(y, 1 - x), (x, 0, 2), title="Randlinjen f(x, 1-x)", show=False)
+    dtuplot.plot(
+        f.subs(x, 0),
+        (y, -1, 1),
+        ylim=(0, 3),
+        aspect="equal",
+        title="Randlinjen f(0, y)",
+        show=False,
+    )
     stat_punkter = set(sols)
 
     lodret = solve(f.subs(x, 0).diff(y))
@@ -652,11 +683,10 @@ def test_week3():
     pf = dtuplot.plot3d(
         f, (x, 0, 2), (y, -1, 1), show=False, rendering_kw={"alpha": 0.7}
     )
-    # Following command changed, as the scatter function changed. 
+    # Following command changed, as the scatter function changed.
     # Each point is now given in a list, so '[]' is added.
     punkter = dtuplot.scatter(
-        [Matrix([2, -1, 0]),
-        Matrix([1 / 2, 0, 13 / 4])],
+        [Matrix([2, -1, 0]), Matrix([1 / 2, 0, 13 / 4])],
         show=False,
         rendering_kw={"color": "red", "s": 20},
     )
@@ -920,7 +950,7 @@ def test_week5():
         (y, -2, 2),
         use_cm=True,
         camera={"elev": 30, "azim": -130},
-        show=False
+        show=False,
     )
     kvadrat = dtuplot.plot3d_parametric_surface(
         x, y, 0, (x, -2, 2), (y, -2, 2), rendering_kw={"color": "black"}, show=False
@@ -949,7 +979,7 @@ def test_week5():
         (v, 0, 2 * pi),
         camera={"azim": -90, "elev": 15},
         title="Omdrejningsfladen",
-        show=False
+        show=False,
     )
     dtuplot.plot(
         (x - 1) ** 3 + 1, (x, 0, 2), axis_center="auto", ylabel="z", show=False
@@ -963,7 +993,7 @@ def test_week5():
         camera={"azim": -65, "elev": 25},
         use_cm=True,
         legend=False,
-        show=False
+        show=False,
     )
     profil = Matrix([2 + sin(u), 0, u])
     dtuplot.plot3d_parametric_line(
@@ -971,7 +1001,7 @@ def test_week5():
         (u, 0, 8 * pi),
         use_cm=False,
         camera={"azim": -28, "elev": 13},
-        show=False
+        show=False,
     )
     r = Matrix([(2 + sin(u)) * cos(v), (2 + sin(u)) * sin(v), u])
     flade = dtuplot.plot3d_parametric_surface(
@@ -981,7 +1011,7 @@ def test_week5():
         camera={"azim": -62, "elev": 15},
         use_cm=True,
         legend=False,
-        show=False
+        show=False,
     )
     lede = Matrix([2 * cos(u), sin(u), 0])
     dtuplot.plot3d_parametric_line(
@@ -997,7 +1027,7 @@ def test_week5():
         zlim=(0, 2),
         use_cm=True,
         legend=False,
-        show=False
+        show=False,
     )
     r = Matrix([2 * cos(u), sin(u), v * (2 * cos(u) + sin(u) ** 2)])
     dtuplot.plot3d_parametric_surface(
@@ -1007,7 +1037,7 @@ def test_week5():
         camera={"azim": -120, "elev": 20},
         use_cm=True,
         legend=False,
-        show=False
+        show=False,
     )
     h = x**2 / 2 + y + 2
     with pytest.warns(
@@ -1031,7 +1061,7 @@ def test_week5():
         v_range,
         show=False,
         rendering_kw={"color": "blue"},
-        camera={"azim": -155, "elev": 15}
+        camera={"azim": -155, "elev": 15},
     )
     grundflade = dtuplot.plot3d_parametric_surface(
         r[0], r[1], 0, u_range, v_range, show=False, rendering_kw={"alpha": 0.6}
@@ -1127,11 +1157,14 @@ def test_week6():
         use_cm=False,
         rendering_kw={"color": "grey", "linestyle": "dashed"},
     )
+    # Added qlim argument here to avoid warning. However, this does not
+    # affect the demos, as this is not in the demos (currently)
     pil3d = dtuplot.quiver(
         Matrix([0.3, 0.375, 0]),
         Matrix([0, 0, 0.375]),
         show=False,
         rendering_kw={"color": "black"},
+        qlim=False,
     )
 
     with pytest.warns(
@@ -1339,9 +1372,7 @@ def test_week7():
     divV0 = divV.subs([(x, 1), (y, 2), (z, 3)])
     N(divV0)
     rotV = dtutools.rot(V, var=[x, y, z])
-    assert rotV == Matrix(
-        [-x * z**3, x * y * cos(z) + y * z**3, -x * sin(z) + log(y)]
-    )
+    assert rotV == Matrix([-x * z**3, x * y * cos(z) + y * z**3, -x * sin(z) + log(y)])
     assert dtutools.rot(V2, var=[u, v, w]) == Matrix([-2 * w, -sin(w), 0])
     rotV0 = rotV.subs([(x, 1), (y, 2), (z, 3)])
     N(rotV0)
@@ -1358,7 +1389,7 @@ def test_week8():
         (v, -pi, pi),
         use_cm=False,
         camera={"elev": 25, "azim": -55},
-        show=False
+        show=False,
     )
     p_felt = dtuplot.plot_vector(
         V,
@@ -1409,7 +1440,7 @@ def test_week8():
         n1=4,
         n2=16,
         camera={"elev": 25, "azim": -55},
-        show=False
+        show=False,
     )
     p_feltlåg = dtuplot.plot_vector(
         V,
@@ -1580,7 +1611,7 @@ def test_week9():
         zlim=(-1.1, 1.1),
         use_cm=False,
         aspect="equal",
-        show=False
+        show=False,
     )
     p_felt = dtuplot.plot_vector(
         V,
@@ -1615,8 +1646,10 @@ def test_week9():
     res = p_kurve + p_flade + p_felt_rot
     N = r.diff(u).cross(r.diff(v))
     assert simplify(N) == Matrix([0, -u, u])
-    p_normalvektor = dtuplot.quiver(s.subs(u, 0), N.subs({u: 1, v: 0}), show=False)
-    p_omloebs = dtuplot.quiver(s.subs(u, 0), ds.subs(u, 0), show=False)
+    # Added qlim argument here to avoid warning. However, this does not
+    # affect the demos, as this is not in the demos (currently)
+    p_normalvektor = dtuplot.quiver(s.subs(u, 0), N.subs({u: 1, v: 0}), show=False, qlim=False)
+    p_omloebs = dtuplot.quiver(s.subs(u, 0), ds.subs(u, 0), show=False, qlim=False)
     p_kurve.camera = {"elev": 5, "azim": -35}
     res = p_kurve + p_flade + p_normalvektor + p_omloebs
     integrand = N.dot(dtutools.rot(V, var=[x, y, z]))
@@ -1632,7 +1665,7 @@ def test_week9():
         use_cm=False,
         aspect="equal",
         camera={"elev": 30, "azim": -80},
-        show=False
+        show=False,
     )
     dummy_surface = dtuplot.plot3d_parametric_surface(
         *r, (u, -pi / 2, pi / 2), (v, -pi, pi / 2), n=10, show=False
@@ -1651,11 +1684,14 @@ def test_week9():
     # sikrer os at vi gennemløber randen i den rigtige retning
     N = r.diff(u).cross(r.diff(v))
     # vektor dobbelt så lang, så den kan ses fra denne vinkel
+    # Added qlim argument here to avoid warning. However, this does not
+    # affect the demos, as this is not in the demos (currently)
     p_normalvektor = dtuplot.quiver(
         r.subs({u: 0, v: -pi / 4}),
         2 * N.subs({u: 0, v: -pi / 4}),
         {"color": "black"},
         show=False,
+        qlim=False
     )
     combined_flade = p_flade + p_felt_flade + p_normalvektor
     combined_flade.title = "Fladen og feltet"
@@ -1674,7 +1710,7 @@ def test_week9():
         use_cm=False,
         aspect="equal",
         camera={"elev": 30, "azim": -80},
-        show=False
+        show=False,
     )
     p_rand.extend(
         dtuplot.plot3d_parametric_line(
@@ -1682,7 +1718,7 @@ def test_week9():
             (v, -pi, pi / 2),
             {"color": "orange", "linewidth": 5},
             use_cm=False,
-            show=False
+            show=False,
         )
     )
     p_rand.extend(
@@ -1691,7 +1727,7 @@ def test_week9():
             (u, -pi / 2, pi / 2),
             {"color": "orange", "linewidth": 5},
             use_cm=False,
-            show=False
+            show=False,
         )
     )
     p_rand.extend(
@@ -1700,7 +1736,7 @@ def test_week9():
             (u, -pi / 2, pi / 2),
             {"color": "orange", "linewidth": 5},
             use_cm=False,
-            show=False
+            show=False,
         )
     )
     p_flade_mesh = dtuplot.plot3d_parametric_surface(
@@ -1710,7 +1746,7 @@ def test_week9():
         rendering_kw={"alpha": 0},
         wf_rendering_kw={"alpha": 0.4},
         wireframe=True,
-        show=False
+        show=False,
     )
     p_felt = dtuplot.plot_vector(
         V,
@@ -1725,11 +1761,15 @@ def test_week9():
     )
     # for hver af de 4 felter vil vi også gerne have retningen af deres afledte
     # dette skal bruges til at bestemme hvilken retning vi skal omløbe linjerne i
+    
+    # Added qlim argument here to avoid warning. However, this does not
+    # affect the demos, as this is not in the demos (currently)
     p_omloebs = dtuplot.quiver(
         s1.subs({u: -pi / 2, v: -pi}),
         ds1.subs({u: -pi / 2, v: -pi}),
         {"color": "red"},
         show=False,
+        qlim=False,
     )
     p_omloebs.extend(
         dtuplot.quiver(
@@ -1737,6 +1777,7 @@ def test_week9():
             ds2.subs({u: -pi / 2, v: -pi}),
             {"color": "green"},
             show=False,
+            qlim=False,
         )
     )
     p_omloebs.extend(
@@ -1745,6 +1786,7 @@ def test_week9():
             ds3.subs({u: -pi / 2, v: -pi}),
             {"color": "blue"},
             show=False,
+            qlim=False,
         )
     )
     p_omloebs.extend(
@@ -1753,6 +1795,7 @@ def test_week9():
             ds4.subs({u: -pi / 2, v: -pi}),
             {"color": "purple"},
             show=False,
+            qlim=False,
         )
     )
     combined_rand = p_rand + p_flade_mesh + p_felt + p_omloebs

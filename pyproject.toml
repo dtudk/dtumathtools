@@ -21,13 +21,14 @@ k3d = [
     "k3d>=2.9.7",
 ]
 qt = ["PyQt5~=5.15.9"]
-# # Variable paths are not compatible with pypi, and
-# # thus mayavi will be unsupported till 4.8.2 is released.
+# # Mayavi is not currently supported
+# # The following list is the known requirements
 # mayavi = [
 #     "PyQt5~=5.15.9",
 #     "vtk",
 #     "ipyevents",
-#     "mayavi @ git+https://git@github.com/enthought/mayavi",
+#     "mayavi==4.8.2",
+#     "configobj",
 # ]
 
 
@@ -52,16 +53,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 
-version = "2024.1.0"
+version = "2024.2.0"
 
 dependencies = [
-    "sympy-plot-backends>=2.4,<3",
+    'sympy-plot-backends>=3.1.1,<3.3;python_version<="3.9"',
+    'sympy-plot-backends>=3.4,<4.0;python_version>="3.10"',
     "sympy~=1.12", 
-    "matplotlib==3.6.*", 
+    "matplotlib>=3.8,<3.10", 
     "jupyter>=1.0.0", 
     "numpy>=1.24,<2",
 ]
-requires-python = ">=3.8,<3.13"
+requires-python = ">=3.9,<3.13"
 
 # generic information
 
@@ -80,14 +82,13 @@ license = {text = "BSD-3-Clause"}
 
 classifiers = [
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Education",
     "Topic :: Education",
     "Topic :: Scientific/Engineering :: Mathematics",

@@ -1,4 +1,4 @@
-from spb.functions import plot_parametric
+from spb import plot_parametric
 from sympy.matrices import MatrixBase
 from spb.backends.base_backend import Plot
 

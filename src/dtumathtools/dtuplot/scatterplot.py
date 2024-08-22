@@ -1,6 +1,6 @@
 from sympy import MatrixBase, Expr, Basic, MutableMatrix, ImmutableMatrix
 from sympy.external import import_module
-from spb.functions import plot_list, plot3d_list
+from spb import plot_list, plot3d_list
 from spb.backends.base_backend import Plot
 import numpy as np
 from spb import MB, PB, BB, KB, MAB
@@ -127,7 +127,7 @@ def scatter(*args, **kwargs):
         if Backend == BB:
             raise NotImplementedError("Bokeh does not support 3D scatter plots!")
         if Backend == MAB:
-            warnings.warn(f"Mayavi is not currently supported by dtumathtools.")
+            warnings.warn("Mayavi is not currently supported by dtumathtools.")
         return plot3d_list(*args, is_point=True, backend=Backend, **kwargs)
 
 

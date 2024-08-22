@@ -1,81 +1,15 @@
 from spb import MB, PB, BB, KB, MAB
 from spb.defaults import THREE_D_B, TWO_D_B
-from spb.functions import _set_labels
-from spb.series import VectorBase
+from spb.plot_functions.functions_2d import _set_labels
 from spb.utils import _instantiate_backend
-from sympy import Matrix, latex, symbols
+from sympy import Matrix
 from sympy.external import import_module
-from spb.backends.base_backend import Plot
 import warnings
+from spb.series import Arrow2DSeries, Arrow3DSeries
+from .quiverplot_helpers import Arrow2DSeries as PB_Arrow2DSeries, Arrow3DSeries as PB_Arrow3DSeries
 
 np = import_module("numpy")
-
-
-class ArrowSeries(VectorBase):
-    """Represent a vector field."""
-
-    is_vector = True
-    is_slice = False
-    is_streamlines = False
-    _allowed_keys = []
-
-    def __init__(self, start, direction, label=None, **kwargs):
-        # Ranges must be given for VectorBase, even though they are None
-        super().__init__(
-            [start, direction], ranges=start.shape[-1] * [None], label=label, **kwargs
-        )
-
-        self.start = start
-        self.direction = direction
-
-        self._label = f"{start}->{direction}" if label is None else label
-        self._latex_label = latex(f"{start}->{direction}") if label is None else label
-
-        # Standard for 'use_cm' should be False
-        self.use_cm = kwargs.get("use_cm", False)
-        # Linked colormap using vector2d renderer
-        self.use_quiver_solid_color = not self.use_cm
-        # Line color needed for Mayavi
-        self._line_color = kwargs.get("line_color", None)
-        # _sal argument saved here and passed to matplotlib backend (if used)
-        self._sal = kwargs.get("_sal", False)
-
-    def __str__(self):
-        # Overwrite the VectorBase __str__ as it assumes things
-        # about variables that does not hold for this class.
-        return self._str_helper(
-            f"Arrow Series with start point {self.start}, and direction {self.direction}"
-        )
-
-    def get_data(self):
-        # This format works for both MB and PB
-        # Has to translate to start/end and transpose
-        # such that the x,y,z lims match the arrow
-        # compensation for this in arrow done in
-        # quiverplot_helpers.
-        start = np.array(self.start)
-        end = start + np.array(self.direction)
-        return np.array(
-            [start, end]
-        ).T  # [np.array([v]) for v in list(self.start) + list(self.direction)]
-
-
-# Specify 2D class such that this can be linked with renderer
-class Arrow2DSeries(ArrowSeries):
-    is_2Dvector = True
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-
-# Specify 3D class such that this can be linked with renderer
-class Arrow3DSeries(ArrowSeries):
-    is_3Dvector = True
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-
+        
 def quiver(*args, **kwargs):
     """Create a plot with a vector.
 
@@ -83,7 +17,7 @@ def quiver(*args, **kwargs):
         start (MatrixBase, np.ndarray, list, float): The starting coordinates (2D or 3D) of the vector. Can be given in multitude of ways/inputs.
         direction (MatrixBase, np.ndarray, list, float): The direction (2D or 3D) of the vector. Can be given in multitude of ways/inputs.
         rendering_kw (dict, optional): A dictionary forwarded to dtuplot.plot(), see SPB docs for reference.
-        qlim (bool, optional): Boolean relevant only for backend MB. If 'True' (default) adjusts xlim and ylim to the quiver.
+        qlim (bool, optional): Boolean relevant only for backend MB. If 'True' (default is False) adjusts xlim and ylim (and zlim) to the quiver.
         color (str, optional): A string to set the color of the vector with. With no argument color = 'blue'.
         show (bool, optional): Boolean, if 'True': show plot, other just return object without plotting. Defaults to 'True'.
 
@@ -124,13 +58,13 @@ def quiver(*args, **kwargs):
         if type(args[i]) in [list, np.ndarray, tuple, type(Matrix())]:
             newpoint = np.array(args[i]).flatten()
             point_args.append(newpoint)
-        elif type(args[i]) == dict:
+        elif isinstance(args[i], dict):
             kwargs.setdefault("rendering_kw", args[i])
         else:
             otherargs.append(args[i])
     assert (
         len(point_args) == 2
-    ), f"Error! Start and direction vectors must be provided (only two vectors)!"
+    ), "Error! Start and direction vectors must be provided (only two vectors)!"
 
     try:
         point_args = np.array(point_args, dtype=float)
@@ -149,7 +83,14 @@ def quiver(*args, **kwargs):
     if len(point_args.shape) == 2:
         point_args = point_args[:, None, :]
 
+    # rendering_kw needs to be passed to the plotting backend, but not
+    # to the series. Thus pulled out here.
+    # Create if it does not exist
+    rendering_kw = kwargs.pop("rendering_kw", {})
+
     labels = kwargs.pop("label", [])
+    # Look in rendering_kw if not found as seperate argument
+    labels = rendering_kw.pop("label", []) if labels == [] else labels
     if type(labels) == str:
         labels = [labels]
     assert type(labels) == list, f"Error! Label must be a list or a string!"
@@ -158,9 +99,15 @@ def quiver(*args, **kwargs):
         point_args.shape[1],
     ], f"Error! Number of labels must be equal to number of arrows, or empty list!"
     if labels == []:
-        labels = [None] * point_args.shape[1]
+        labels = [""] * point_args.shape[1]
+        kwargs.setdefault("legend", False)
+    else:
+        # Label is given, so set legend=True as default
+        kwargs.setdefault("legend", True)
+        # If given as latex code already, do not wrap in additional $ later
+        if labels[0][0] == "$":
+            kwargs.setdefault("use_latex", False)
 
-    kwargs.setdefault("legend", True)
     # params are directly linked with interactive plots
     # if present, the BaseSeries will activate the 'is_interactive' flag
     params = kwargs.get("params", None)
@@ -171,63 +118,74 @@ def quiver(*args, **kwargs):
 
         kwargs["is_vector"] = True
         return iplot(*args, **kwargs)
-
-    # rendering_kw needs to be passed to the plotting backend, but not
-    # to the series. Thus pulled out here.
-    # Create if it does not exist
-    rendering_kw = kwargs.pop("rendering_kw", {})
     # normalize argument needs to be passed to series object, but not to
     # backend. Otherwise warning will be raised. Thus pulled out here.
     normalize = kwargs.pop("normalize", False)
-    # automatically adjust the limits to the quiver. Only relevant for MB.
-    # saved in series, which propagates to the renderer when created.
-    qlim = kwargs.pop("qlim", True)
-
+    
     # if 2D
     if point_args.shape[-1] == 2:
         Backend = kwargs.pop("backend", TWO_D_B)
-        Series = Arrow2DSeries
 
-        # Specific for matplotlib backend
-        if Backend == MB:
-            # Update values for length of vector to fit
-            rendering_kw.setdefault("angles", "xy")
-            rendering_kw.setdefault("scale_units", "xy")
-            rendering_kw.setdefault("scale", 1)
-        elif Backend == PB:
+        # Specific arguments for backends
+        if Backend == PB:
             rendering_kw.setdefault("scale", 1)
             rendering_kw.setdefault("scaleratio", 1)
-        elif Backend == BB:
-            mag = np.linalg.norm(point_args[-1].flatten(), 2)
-            rendering_kw.setdefault("scale", mag)
-            rendering_kw.setdefault("pivot", "tail")
-        elif Backend == KB:
+            # I do not like how plotly is handled in spb,
+            # so for PB, we use the older solution that works well
+            Series = PB_Arrow2DSeries
+        else:
+            Series = Arrow2DSeries
+            
+        if Backend == KB:
             raise NotImplementedError("K3D backend does not support 2D vector plots!")
-        elif Backend == MAB:
+        if Backend == MAB:
             raise NotImplementedError(
                 "Mayavi backend does not support 2D vector plots!"
             )
     else:
         Backend = kwargs.pop("backend", THREE_D_B)
-        Series = Arrow3DSeries
 
         if Backend == PB:
             rendering_kw.setdefault("sizeref", 1)
             rendering_kw.setdefault("sizemode", "scaled")
-            rendering_kw.setdefault("anchor", "tail")  # point_args[0,0]
-        elif Backend == BB:
+            rendering_kw.setdefault("anchor", "tail")
+            # I do not like how plotly is handled in spb (does not work in 3D)
+            # so for PB, we use the older solution that works well
+            Series = PB_Arrow3DSeries
+        else:
+            Series = Arrow3DSeries
+        if Backend == BB:
             raise NotImplementedError("Bokeh backend does not support 3D vector plots!")
-        elif Backend == KB:
-            rendering_kw.setdefault("pivot", "tail")
-        elif Backend == MAB:
-            warnings.warn(f"Mayavi is not currently supported by dtumathtools.")
-            rendering_kw.setdefault("scale_factor", 1)
-            rendering_kw.setdefault("resolution", 100)
+
+        if Backend == MAB:
+            warnings.warn("Mayavi is not currently supported by dtumathtools.")
             display_warning = kwargs.pop("warning", True)
             if display_warning:
                 warnings.warn(
-                    f"Because of the Mayavi backend, the origin of the vector might be slightly off. To supress this warning, set 'warning=False'"
+                    "Because of the Mayavi backend, the origin of the vector might be slightly off. "+\
+                        "To supress this warning, set 'warning=False'"
                 )
+    
+    if "qlim" not in kwargs and "xlim" not in kwargs and "ylim" not in kwargs and point_args.shape[-1] == 3 and Backend == MB:
+        warnings.warn("Warning: Limits were not given for a 3D quiver using Matplotlib. "+\
+            "The quiver might not be in frame. Consider manually setting the limits, or set 'qlim=True'.")
+    # automatically adjust the limits to the quiver. Only relevant for MB.
+    # saved in series, which propagates to the renderer when created.
+    qlim = kwargs.pop("qlim", False)
+    
+    # Automatically adjust limits (if not already given) if qlim=True
+    if Backend == MB and qlim:
+        margin = kwargs.pop("margin", 0.05)
+        # lower and upper boundaries of limits
+        minlim, maxlim = point_args[0].copy(), point_args[0].copy()
+        # tmp = minlim.copy()
+        minlim[point_args[1]<0] += point_args[1][point_args[1]<0]
+        maxlim[point_args[1]>0] += point_args[1][point_args[1]>0]
+        # minlim = tmp
+        kwargs.setdefault("xlim", [np.nanmin(minlim[:,0])-margin, np.nanmax(maxlim[:,0])+margin])
+        kwargs.setdefault("ylim", [np.nanmin(minlim[:,1])-margin, np.nanmax(maxlim[:,1])+margin])
+        if point_args.shape[-1] == 3:
+            kwargs.setdefault("zlim", [np.nanmin(minlim[:,2])-margin, np.nanmax(maxlim[:,2])+margin])
 
     series = [
         Series(
@@ -236,11 +194,12 @@ def quiver(*args, **kwargs):
             *otherargs,
             label=label,
             normalize=normalize,
-            _sal=(qlim and Backend==MB), # save qlim kwarg in series object (if MB)
+            show_in_legend=False if label=="" else True, # remove legend if no label
             **kwargs,
-        ) for start, stop, label in zip(point_args[0, :, :], point_args[1, :, :], labels)
+        )
+        for start, stop, label in zip(point_args[0, :, :], point_args[1, :, :], labels)
     ]
-
+    
     _set_labels(series, labels, rendering_kw)
 
     # if multiple arrows are given, plot them all in one plot
