@@ -36,8 +36,13 @@ The procedure will be something like this:
 
 1. Create a new branch for the release (if not already done), the
    name will be "bYYYY.SEMESTER".
-2. Create an annotated tag for the release "vYYYY.SEMESTER.FIX".
-3. Check that PyPi works.
-4. Create conda-forge releases. Again, to support multiple releases,
+2. Correct the version specifications in these files:
+
+   - pyproject.toml
+   - src/dtumathtools/__init__.py
+
+3. Create an annotated tag for the release "vYYYY.SEMESTER.FIX".
+4. Check that PyPi works.
+5. Create conda-forge releases. Again, to support multiple releases,
    we must employ a branch-structure there. They will be supported for
    6 years, then branch-deletion will occur.
